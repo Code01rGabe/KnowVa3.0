@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import DashboardLayout from '../layout/DashboardLayout';
 import api from '../../utils/api';
 
 const actionCards = [
@@ -64,10 +65,29 @@ const AdminDashboard = () => {
     setSettingsMessage('Feature toggles saved (mock).');
   };
 
-  const handleAnnouncementSend = (e) => {
+  const handleAnnouncementSend = async (e) => {
     e.preventDefault();
-    setAnnouncementStatus('Announcement queued for delivery (mock).');
-    setNewAnnouncement({ title: '', message: '', audience: 'all' });
+    try {
+      setAnnouncementStatus('');
+      const response = await api.post('/admin/announcements', {
+        title: newAnnouncement.title,
+        message: newAnnouncement.message,
+        audience: newAnnouncement.audience,
+      });
+      
+      setAnnouncementStatus('Announcement sent successfully!');
+      setNewAnnouncement({ title: '', message: '', audience: 'all' });
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setAnnouncementStatus('');
+      }, 3000);
+    } catch (error) {
+      console.error('Error sending announcement:', error);
+      setAnnouncementStatus(
+        error.response?.data?.message || 'Error sending announcement. Please try again.'
+      );
+    }
   };
 
   const statCards = stats?.stats
@@ -85,46 +105,152 @@ const AdminDashboard = () => {
     : [];
 
   return (
-    <div className="container">
-      <div className="fade-up" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
-        <div>
-          <p className="badge">Super Admin</p>
-          <h1>Platform Command Center</h1>
-          <p style={{ color: 'var(--text-secondary)' }}>Oversee every school, user, and system feature from one pane of glass.</p>
+    <DashboardLayout>
+      <div>
+        <div style={{ marginBottom: '32px' }}>
+          <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#1e293b', marginBottom: '8px' }}>
+            Dashboard
+          </h1>
+          <p style={{ color: '#64748b', fontSize: '16px' }}>
+            Platform Command Center - Oversee every school, user, and system feature
+          </p>
         </div>
-        <button className="btn btn-secondary" onClick={logout}>
-          Logout
-        </button>
-      </div>
 
-      <div className="stats-grid">
-        {statCards.map((card, index) => (
-          <div key={card.label} className={`stats-card glass-card delay-${index % 3}`}>
-            <h3>{card.label}</h3>
-            <div className="value">{card.value ?? 0}</div>
-          </div>
-        ))}
-      </div>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', 
+          gap: '20px',
+          marginBottom: '32px'
+        }}>
+          {statCards.map((card, index) => {
+            const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#f97316'];
+            const icons = ['🏫', '✅', '👥', '👨‍🏫', '🎓', '📚', '📝', '⏳', '📊'];
+            return (
+              <div
+                key={card.label}
+                style={{
+                  backgroundColor: '#fff',
+                  borderRadius: '12px',
+                  padding: '24px',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                  border: '1px solid #e2e8f0',
+                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '10px',
+                    backgroundColor: `${colors[index % colors.length]}15`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '24px',
+                  }}>
+                    {icons[index % icons.length]}
+                  </div>
+                </div>
+                <div>
+                  <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '8px', fontWeight: '500' }}>
+                    {card.label}
+                  </p>
+                  <p style={{ fontSize: '32px', fontWeight: '700', color: '#1e293b' }}>
+                    {card.value ?? 0}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
-      <div className="features-grid" style={{ marginTop: 30 }}>
-        {actionCards.map((card) => (
-          <div key={card.title} className="feature-card">
-            <h3>{card.title}</h3>
-            <p style={{ marginTop: 8, color: 'var(--text-secondary)' }}>{card.subtitle}</p>
-            {card.target.startsWith('/admin') ? (
-              <button className="btn outline-button" style={{ marginTop: 12 }} onClick={() => navigate(card.target)}>
-                Open
-              </button>
-            ) : (
-              <a className="btn outline-button" style={{ marginTop: 12 }} href={card.target}>
-                Go
-              </a>
-            )}
-          </div>
-        ))}
-      </div>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+          gap: '20px',
+          marginBottom: '32px'
+        }}>
+          {actionCards.map((card) => (
+            <div
+              key={card.title}
+              style={{
+                backgroundColor: '#fff',
+                borderRadius: '12px',
+                padding: '24px',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                border: '1px solid #e2e8f0',
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+              }}
+            >
+              <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>
+                {card.title}
+              </h3>
+              <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '16px' }}>
+                {card.subtitle}
+              </p>
+              {card.target.startsWith('/admin') ? (
+                <button
+                  style={{
+                    padding: '8px 16px',
+                    fontSize: '14px',
+                    backgroundColor: 'transparent',
+                    color: '#ff6600',
+                    border: '1px solid #ff6600',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                  }}
+                  onClick={() => navigate(card.target)}
+                >
+                  Open
+                </button>
+              ) : (
+                <a
+                  href={card.target}
+                  style={{
+                    padding: '8px 16px',
+                    fontSize: '14px',
+                    backgroundColor: 'transparent',
+                    color: '#ff6600',
+                    border: '1px solid #ff6600',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                    textDecoration: 'none',
+                    display: 'inline-block',
+                  }}
+                >
+                  Go
+                </a>
+              )}
+            </div>
+          ))}
+        </div>
 
-      <div id="system-settings" className="card glass-card fade-up" style={{ marginTop: 40 }}>
+        <div id="system-settings" style={{
+          backgroundColor: '#fff',
+          borderRadius: '12px',
+          padding: '24px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          border: '1px solid #e2e8f0',
+          marginBottom: '32px',
+        }}>
         <h2>System Settings</h2>
         <p style={{ color: 'var(--text-secondary)' }}>
           UI demo — wire these controls to the platform settings service to persist branding, maintenance mode, and feature flags.
@@ -165,7 +291,14 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div id="announcements" className="card glass-card fade-up" style={{ marginTop: 30 }}>
+        <div id="announcements" style={{
+          backgroundColor: '#fff',
+          borderRadius: '12px',
+          padding: '24px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          border: '1px solid #e2e8f0',
+          marginBottom: '32px',
+        }}>
         <h2>Global Announcements</h2>
         <form onSubmit={handleAnnouncementSend}>
           <div className="form-group">
@@ -196,15 +329,25 @@ const AdminDashboard = () => {
               <option value="students">Students</option>
             </select>
           </div>
-          {announcementStatus && <div className="success">{announcementStatus}</div>}
+          {announcementStatus && (
+            <div className={announcementStatus.toLowerCase().includes('error') ? 'error' : 'success'}>
+              {announcementStatus}
+            </div>
+          )}
           <button className="btn btn-primary" type="submit">
             Send Announcement
           </button>
         </form>
       </div>
 
-      <div className="card glass-card fade-up" style={{ marginTop: 30 }}>
-        <h2>Most Active Schools</h2>
+        <div style={{
+          backgroundColor: '#fff',
+          borderRadius: '12px',
+          padding: '24px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          border: '1px solid #e2e8f0',
+        }}>
+          <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', marginBottom: '20px' }}>Most Active Schools</h2>
         {schoolsPreview.length === 0 ? (
           <p>No schools yet.</p>
         ) : (
@@ -231,8 +374,9 @@ const AdminDashboard = () => {
             </table>
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 

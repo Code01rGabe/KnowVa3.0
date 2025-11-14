@@ -120,18 +120,34 @@ const enrollStudent = async (req, res) => {
   if (!schoolId) return;
 
   const { studentId } = req.body;
+  if (!studentId) {
+    return res.status(400).json({ message: 'Student ID is required' });
+  }
+
   try {
     const classroom = await Classroom.findOne({ _id: req.params.classroomId, schoolId });
     if (!classroom) {
       return res.status(404).json({ message: 'Classroom not found' });
     }
 
-    if (!classroom.students.includes(studentId)) {
+    // Check if student is already enrolled
+    const studentExists = classroom.students.some(
+      (id) => id.toString() === studentId.toString()
+    );
+
+    if (!studentExists) {
       classroom.students.push(studentId);
       await classroom.save();
+      
+      // Reload to get populated data
+      const updatedClassroom = await Classroom.findById(classroom._id)
+        .populate('teachers', 'profile.name email')
+        .populate('students', 'profile.name email');
+      
+      return res.json({ message: 'Student enrolled successfully', classroom: updatedClassroom });
+    } else {
+      return res.status(400).json({ message: 'Student is already enrolled in this classroom' });
     }
-
-    res.json({ message: 'Student enrolled', classroom });
   } catch (error) {
     console.error('School admin enroll student error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -164,18 +180,34 @@ const addTeacher = async (req, res) => {
   if (!schoolId) return;
 
   const { teacherId } = req.body;
+  if (!teacherId) {
+    return res.status(400).json({ message: 'Teacher ID is required' });
+  }
+
   try {
     const classroom = await Classroom.findOne({ _id: req.params.classroomId, schoolId });
     if (!classroom) {
       return res.status(404).json({ message: 'Classroom not found' });
     }
 
-    if (!classroom.teachers.includes(teacherId)) {
+    // Check if teacher is already in the classroom
+    const teacherExists = classroom.teachers.some(
+      (id) => id.toString() === teacherId.toString()
+    );
+
+    if (!teacherExists) {
       classroom.teachers.push(teacherId);
       await classroom.save();
+      
+      // Reload to get populated data
+      const updatedClassroom = await Classroom.findById(classroom._id)
+        .populate('teachers', 'profile.name email')
+        .populate('students', 'profile.name email');
+      
+      return res.json({ message: 'Teacher added successfully', classroom: updatedClassroom });
+    } else {
+      return res.status(400).json({ message: 'Teacher is already assigned to this classroom' });
     }
-
-    res.json({ message: 'Teacher added', classroom });
   } catch (error) {
     console.error('School admin add teacher error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });

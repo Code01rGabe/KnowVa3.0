@@ -17,12 +17,23 @@ const {
   updateUser,
   resetUserPassword,
 } = require('../controllers/adminManagementController');
+const {
+  createAnnouncement,
+  getAllAnnouncements,
+  updateAnnouncementStatus,
+} = require('../controllers/announcementController');
 const authenticate = require('../middleware/auth');
 const roleCheck = require('../middleware/roleCheck');
 
 // Validation rules
 const schoolCodeValidation = [
   body('schoolName').trim().notEmpty().withMessage('School name is required'),
+];
+
+const announcementValidation = [
+  body('title').trim().notEmpty().withMessage('Title is required'),
+  body('message').trim().notEmpty().withMessage('Message is required'),
+  body('audience').optional().isIn(['all', 'teachers', 'students']).withMessage('Invalid audience'),
 ];
 
 // Routes
@@ -109,6 +120,29 @@ router.post(
   authenticate,
   roleCheck('admin'),
   resetUserPassword
+);
+
+// Announcement routes
+router.post(
+  '/announcements',
+  authenticate,
+  roleCheck('admin'),
+  announcementValidation,
+  createAnnouncement
+);
+
+router.get(
+  '/announcements',
+  authenticate,
+  roleCheck('admin'),
+  getAllAnnouncements
+);
+
+router.patch(
+  '/announcements/:id/status',
+  authenticate,
+  roleCheck('admin'),
+  updateAnnouncementStatus
 );
 
 module.exports = router;

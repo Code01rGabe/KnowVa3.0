@@ -1,6 +1,7 @@
 const Course = require('../models/Course');
 const Assignment = require('../models/Assignment');
 const Submission = require('../models/Submission');
+const Classroom = require('../models/Classroom');
 
 // Teacher overview stats
 const getTeacherStats = async (req, res) => {
@@ -58,6 +59,17 @@ const getTeacherStats = async (req, res) => {
       ? Number((totalEnrolled / courseCount).toFixed(1))
       : 0;
 
+    // Get classrooms for this teacher
+    const classrooms = req.user.schoolId
+      ? await Classroom.find({
+          schoolId: req.user.schoolId,
+          teachers: teacherId,
+        })
+          .populate('students', 'profile.name email')
+          .select('name description level students createdAt')
+          .sort({ createdAt: -1 })
+      : [];
+
     const recentCourses = courses.slice(0, 4).map((course) => ({
       id: course._id,
       title: course.title,
@@ -82,9 +94,18 @@ const getTeacherStats = async (req, res) => {
         averageStudentsPerCourse,
         averageGrade,
         pendingSubmissions,
+        classroomCount: classrooms.length,
       },
       recentCourses,
       upcomingAssignments,
+      classrooms: classrooms.map((classroom) => ({
+        id: classroom._id,
+        name: classroom.name,
+        description: classroom.description,
+        level: classroom.level,
+        studentCount: classroom.students?.length || 0,
+        createdAt: classroom.createdAt,
+      })),
     });
   } catch (error) {
     console.error('Teacher dashboard stats error:', error);
@@ -171,6 +192,17 @@ const getStudentStats = async (req, res) => {
       updatedAt: submission.updatedAt,
     }));
 
+    // Get classrooms for this student
+    const classrooms = req.user.schoolId
+      ? await Classroom.find({
+          schoolId: req.user.schoolId,
+          students: studentId,
+        })
+          .populate('teachers', 'profile.name email')
+          .select('name description level teachers createdAt')
+          .sort({ createdAt: -1 })
+      : [];
+
     res.json({
       metrics: {
         courseCount,
@@ -178,10 +210,19 @@ const getStudentStats = async (req, res) => {
         completedAssignments: gradedSubmissions.length,
         pendingAssignments,
         totalSubmissions: submissions.length,
+        classroomCount: classrooms.length,
       },
       upcomingAssignments,
       recentGrades,
       courses: courses.slice(0, 4),
+      classrooms: classrooms.map((classroom) => ({
+        id: classroom._id,
+        name: classroom.name,
+        description: classroom.description,
+        level: classroom.level,
+        teacherCount: classroom.teachers?.length || 0,
+        createdAt: classroom.createdAt,
+      })),
     });
   } catch (error) {
     console.error('Student dashboard stats error:', error);

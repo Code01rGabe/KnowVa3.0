@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import DashboardLayout from '../layout/DashboardLayout';
 import api from '../../utils/api';
 
 const tabs = [
@@ -77,8 +78,15 @@ const SchoolRepDashboard = () => {
   };
 
   const loadClassrooms = async () => {
-    const response = await api.get('/school/classrooms');
-    setClassrooms(response.data.data || []);
+    try {
+      const response = await api.get('/school/classrooms');
+      const classrooms = response.data.data || [];
+      // Ensure we have the latest data with populated teachers and students
+      setClassrooms(classrooms);
+    } catch (error) {
+      console.error('Error loading classrooms:', error);
+      setMessage('Error loading classrooms');
+    }
   };
 
   const loadSubjects = async () => {
@@ -160,16 +168,40 @@ const SchoolRepDashboard = () => {
     loadMaterials();
   };
 
-  const handleEnroll = async (classroomId, studentId) => {
+  const handleEnroll = async (classroomId, studentId, selectElement) => {
     if (!studentId) return;
-    await api.post(`/school/classrooms/${classroomId}/enroll`, { studentId });
-    loadClassrooms();
+    try {
+      setMessage('');
+      const response = await api.post(`/school/classrooms/${classroomId}/enroll`, { studentId });
+      setMessage('Student enrolled successfully');
+      if (selectElement) selectElement.value = '';
+      // Force a refresh of classrooms to get updated data
+      await loadClassrooms();
+      // Clear success message after 3 seconds
+      setTimeout(() => setMessage(''), 3000);
+    } catch (error) {
+      console.error('Enrollment error:', error);
+      setMessage(error.response?.data?.message || 'Error enrolling student');
+      setTimeout(() => setMessage(''), 5000);
+    }
   };
 
-  const handleAddTeacher = async (classroomId, teacherId) => {
+  const handleAddTeacher = async (classroomId, teacherId, selectElement) => {
     if (!teacherId) return;
-    await api.post(`/school/classrooms/${classroomId}/add-teacher`, { teacherId });
-    loadClassrooms();
+    try {
+      setMessage('');
+      const response = await api.post(`/school/classrooms/${classroomId}/add-teacher`, { teacherId });
+      setMessage('Teacher added successfully');
+      if (selectElement) selectElement.value = '';
+      // Force a refresh of classrooms to get updated data
+      await loadClassrooms();
+      // Clear success message after 3 seconds
+      setTimeout(() => setMessage(''), 3000);
+    } catch (error) {
+      console.error('Add teacher error:', error);
+      setMessage(error.response?.data?.message || 'Error adding teacher');
+      setTimeout(() => setMessage(''), 5000);
+    }
   };
 
   const recordAttendance = async (e) => {
@@ -202,7 +234,13 @@ const SchoolRepDashboard = () => {
   };
 
   if (loading) {
-    return <div className="container">Loading...</div>;
+    return (
+      <DashboardLayout>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+          <p>Loading...</p>
+        </div>
+      </DashboardLayout>
+    );
   }
 
   const statCards = stats
@@ -217,16 +255,41 @@ const SchoolRepDashboard = () => {
 
   const renderOverview = () => (
     <>
-      <div className="stats-grid">
-        {statCards.map((card, index) => (
-          <div key={card.label} className={`stats-card glass-card delay-${index % 3}`}>
-            <h3>{card.label}</h3>
-            <div className="value">{card.value ?? 0}</div>
-          </div>
-        ))}
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+        gap: '20px',
+        marginBottom: '32px'
+      }}>
+        {statCards.map((card, index) => {
+          const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+          return (
+            <div
+              key={card.label}
+              style={{
+                backgroundColor: '#f8fafc',
+                borderRadius: '10px',
+                padding: '20px',
+                border: '1px solid #e2e8f0',
+              }}
+            >
+              <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '8px', fontWeight: '500' }}>
+                {card.label}
+              </p>
+              <p style={{ fontSize: '28px', fontWeight: '700', color: '#1e293b' }}>
+                {card.value ?? 0}
+              </p>
+            </div>
+          );
+        })}
       </div>
 
-      <div className="card glass-card fade-up">
+      <div style={{
+        backgroundColor: '#f8fafc',
+        borderRadius: '10px',
+        padding: '24px',
+        border: '1px solid #e2e8f0',
+      }}>
         <h2>Registration Codes</h2>
         <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
           <div className="glass-card stats-card">
@@ -249,7 +312,7 @@ const SchoolRepDashboard = () => {
   );
 
   const renderClasses = () => (
-    <div className="card glass-card fade-up">
+    <div>
       <h2>Classrooms & Streams</h2>
       <form onSubmit={createClassroom}>
         <div className="form-group">
@@ -285,21 +348,41 @@ const SchoolRepDashboard = () => {
                 <td>{classroom.teachers?.length || 0}</td>
                 <td>{classroom.students?.length || 0}</td>
                 <td style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  <select onChange={(e) => handleEnroll(classroom._id, e.target.value)} defaultValue="">
+                  <select 
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        handleEnroll(classroom._id, e.target.value, e.target);
+                      }
+                    }} 
+                    defaultValue=""
+                    style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid var(--border)' }}
+                  >
                     <option value="">Enroll student</option>
-                    {students.map((student) => (
-                      <option key={student._id} value={student._id}>
-                        {student.profile?.name}
-                      </option>
-                    ))}
+                    {students
+                      .filter((student) => !classroom.students?.some((s) => (s._id || s).toString() === student._id.toString()))
+                      .map((student) => (
+                        <option key={student._id} value={student._id}>
+                          {student.profile?.name || student.email}
+                        </option>
+                      ))}
                   </select>
-                  <select onChange={(e) => handleAddTeacher(classroom._id, e.target.value)} defaultValue="">
+                  <select 
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        handleAddTeacher(classroom._id, e.target.value, e.target);
+                      }
+                    }} 
+                    defaultValue=""
+                    style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid var(--border)' }}
+                  >
                     <option value="">Add teacher</option>
-                    {teachers.map((teacher) => (
-                      <option key={teacher._id} value={teacher._id}>
-                        {teacher.profile?.name}
-                      </option>
-                    ))}
+                    {teachers
+                      .filter((teacher) => !classroom.teachers?.some((t) => (t._id || t).toString() === teacher._id.toString()))
+                      .map((teacher) => (
+                        <option key={teacher._id} value={teacher._id}>
+                          {teacher.profile?.name || teacher.email}
+                        </option>
+                      ))}
                   </select>
                 </td>
               </tr>
@@ -312,7 +395,7 @@ const SchoolRepDashboard = () => {
 
   const renderSubjects = () => (
     <>
-      <div className="card glass-card fade-up">
+      <div style={{ marginBottom: '24px' }}>
         <h2>Subjects</h2>
         <form onSubmit={createSubject}>
           <div className="form-group">
@@ -357,8 +440,8 @@ const SchoolRepDashboard = () => {
         </div>
       </div>
 
-      <div className="card glass-card fade-up">
-        <h2>Learning Materials</h2>
+      <div style={{ marginTop: '24px' }}>
+        <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', marginBottom: '20px' }}>Learning Materials</h2>
         <table className="list-table">
           <thead>
             <tr>
@@ -393,7 +476,7 @@ const SchoolRepDashboard = () => {
   );
 
   const renderAttendance = () => (
-    <div className="card glass-card fade-up">
+    <div>
       <h2>Attendance</h2>
       <form onSubmit={recordAttendance}>
         <div className="form-group">
@@ -433,7 +516,7 @@ const SchoolRepDashboard = () => {
   );
 
   const renderAnalytics = () => (
-    <div className="card glass-card fade-up">
+    <div>
       <h2>School Analytics</h2>
       {analytics ? (
         <>
@@ -465,7 +548,7 @@ const SchoolRepDashboard = () => {
   );
 
   const renderSettings = () => (
-    <div className="card glass-card fade-up">
+    <div>
       <h2>School Settings</h2>
       <form onSubmit={saveSettings}>
         <div className="form-group">
@@ -516,7 +599,7 @@ const SchoolRepDashboard = () => {
   );
 
   const renderCommunications = () => (
-    <div className="card glass-card fade-up">
+    <div>
       <h2>Announcements & Support</h2>
       <form onSubmit={handleAnnouncement}>
         <div className="form-group">
@@ -550,34 +633,88 @@ const SchoolRepDashboard = () => {
   };
 
   return (
-    <div className="container">
-      <div className="fade-up" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
-        <div>
-          <p className="badge">School Administrator</p>
-          <h1>{school?.name || 'Your School'}</h1>
-          <p style={{ color: 'var(--text-secondary)' }}>Manage classes, subjects, attendance, analytics, and communications.</p>
+    <DashboardLayout>
+      <div>
+        <div style={{ marginBottom: '32px' }}>
+          <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#1e293b', marginBottom: '8px' }}>
+            {school?.name || 'Your School'}
+          </h1>
+          <p style={{ color: '#64748b', fontSize: '16px' }}>
+            Manage classes, subjects, attendance, analytics, and communications.
+          </p>
         </div>
-        <button className="btn btn-secondary" onClick={logout}>
-          Logout
-        </button>
-      </div>
 
-      {message && <div className={message.toLowerCase().includes('unable') ? 'error' : 'success'}>{message}</div>}
-
-      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: 20 }}>
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            className={`btn ${activeTab === tab.id ? 'btn-primary' : 'outline-button'}`}
-            onClick={() => setActiveTab(tab.id)}
+        {message && (
+          <div
+            style={{
+              padding: '12px 16px',
+              borderRadius: '8px',
+              marginBottom: '24px',
+              backgroundColor: message.toLowerCase().includes('unable') || message.toLowerCase().includes('error')
+                ? 'rgba(239, 68, 68, 0.1)'
+                : 'rgba(16, 185, 129, 0.1)',
+              color: message.toLowerCase().includes('unable') || message.toLowerCase().includes('error')
+                ? '#dc2626'
+                : '#059669',
+              border: `1px solid ${message.toLowerCase().includes('unable') || message.toLowerCase().includes('error') ? '#fecaca' : '#a7f3d0'}`,
+            }}
           >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+            {message}
+          </div>
+        )}
 
-      {tabContent[activeTab]}
-    </div>
+        <div style={{
+          display: 'flex',
+          gap: '8px',
+          flexWrap: 'wrap',
+          marginBottom: '24px',
+          paddingBottom: '16px',
+          borderBottom: '2px solid #e2e8f0',
+        }}>
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                padding: '10px 20px',
+                fontSize: '14px',
+                fontWeight: '500',
+                backgroundColor: activeTab === tab.id ? '#ff6600' : 'transparent',
+                color: activeTab === tab.id ? '#fff' : '#64748b',
+                border: `1px solid ${activeTab === tab.id ? '#ff6600' : '#e2e8f0'}`,
+                borderRadius: '8px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                if (activeTab !== tab.id) {
+                  e.target.style.backgroundColor = '#f8fafc';
+                  e.target.style.borderColor = '#cbd5e1';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeTab !== tab.id) {
+                  e.target.style.backgroundColor = 'transparent';
+                  e.target.style.borderColor = '#e2e8f0';
+                }
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <div style={{
+          backgroundColor: '#fff',
+          borderRadius: '12px',
+          padding: '24px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          border: '1px solid #e2e8f0',
+        }}>
+          {tabContent[activeTab]}
+        </div>
+      </div>
+    </DashboardLayout>
   );
 };
 

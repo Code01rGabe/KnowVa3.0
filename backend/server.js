@@ -24,6 +24,8 @@ app.use('/api/courses', require('./routes/courses'));
 app.use('/api/assignments', require('./routes/assignments'));
 app.use('/api/submissions', require('./routes/submissions'));
 app.use('/api/dashboard', require('./routes/dashboard'));
+app.use('/api/announcements', require('./routes/announcements'));
+app.use('/api/teacher', require('./routes/teacherClass'));
 
 // Health check
 app.get('/api/health', (req, res) => {

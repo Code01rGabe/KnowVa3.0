@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import DashboardLayout from '../layout/DashboardLayout';
 import api from '../../utils/api';
 
 const CourseDetail = () => {
@@ -96,163 +97,302 @@ const CourseDetail = () => {
   };
 
   if (loading) {
-    return <div className="container">Loading...</div>;
+    return (
+      <DashboardLayout>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+          <p>Loading...</p>
+        </div>
+      </DashboardLayout>
+    );
   }
 
   if (!course) {
-    return <div className="container">Course not found</div>;
+    return (
+      <DashboardLayout>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+          <p>Course not found</p>
+        </div>
+      </DashboardLayout>
+    );
   }
 
   const enrolledStudentIds = new Set(enrolledStudents.map((student) => student._id));
   const unenrolledStudents = availableStudents.filter((student) => !enrolledStudentIds.has(student._id));
 
   return (
-    <div className="container">
-      <div style={{ marginBottom: '20px' }}>
-        <button className="btn btn-secondary" onClick={() => navigate(-1)}>
-          Back
-        </button>
-      </div>
+    <DashboardLayout>
+      <div>
+        <div style={{ marginBottom: '24px' }}>
+          <button
+            onClick={() => navigate(-1)}
+            style={{
+              padding: '8px 16px',
+              fontSize: '14px',
+              backgroundColor: 'transparent',
+              color: '#64748b',
+              border: '1px solid #e2e8f0',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              marginBottom: '16px',
+            }}
+          >
+            ← Back
+          </button>
+          <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#1e293b', marginBottom: '8px' }}>
+            {course.title}
+          </h1>
+          <p style={{ color: '#64748b', fontSize: '16px' }}>{course.description}</p>
+        </div>
 
-      <div className="card">
-        <h1>{course.title}</h1>
-        <p style={{ color: '#666', marginBottom: '20px' }}>{course.description}</p>
-        <p><strong>Teacher:</strong> {course.teacherId?.profile?.name || course.teacherId?.email}</p>
-      </div>
+        {message && (
+          <div
+            style={{
+              padding: '12px 16px',
+              borderRadius: '8px',
+              marginBottom: '24px',
+              backgroundColor: message.toLowerCase().includes('error') ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+              color: message.toLowerCase().includes('error') ? '#dc2626' : '#059669',
+              border: `1px solid ${message.toLowerCase().includes('error') ? '#fecaca' : '#a7f3d0'}`,
+            }}
+          >
+            {message}
+          </div>
+        )}
 
-      {user?.role === 'teacher' && (
-        <>
-          <div className="card">
-            <h2>Enroll Student</h2>
-            {message && (
-              <div className={message.toLowerCase().includes('error') ? 'error' : 'success'}>
-                {message}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
+          gap: '24px',
+          marginBottom: '24px'
+        }}>
+          <div style={{
+            backgroundColor: '#fff',
+            borderRadius: '12px',
+            padding: '24px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+            border: '1px solid #e2e8f0',
+          }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', marginBottom: '20px' }}>
+              Course Information
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div>
+                <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '4px' }}>Teacher</p>
+                <p style={{ fontSize: '15px', fontWeight: '500', color: '#1e293b' }}>
+                  {course.teacherId?.profile?.name || course.teacherId?.email}
+                </p>
               </div>
-            )}
-            {studentsError && <div className="error">{studentsError}</div>}
-            <form onSubmit={handleEnrollStudent} style={{ display: 'flex', gap: '10px', alignItems: 'end', flexWrap: 'wrap' }}>
-              <div className="form-group" style={{ flex: '1 1 250px', marginBottom: 0 }}>
-                <label>Select Student</label>
-                {studentsLoading ? (
-                  <div>Loading students...</div>
-                ) : (
-                  <>
-                    <select
-                      value={selectedStudentId}
-                      onChange={(e) => setSelectedStudentId(e.target.value)}
-                      disabled={unenrolledStudents.length === 0}
-                      required
-                    >
-                      <option value="">Choose a student</option>
-                      {unenrolledStudents.map((student) => (
-                        <option key={student._id} value={student._id}>
-                          {(student.profile?.name || 'Unnamed Student') + ` (${student.email})`}
-                        </option>
-                      ))}
-                    </select>
-                    {unenrolledStudents.length === 0 && !studentsError && (
-                      <p style={{ marginTop: '8px', color: 'var(--text-secondary)' }}>
-                        No available students to enroll. Ask students to join your school first.
-                      </p>
-                    )}
-                  </>
-                )}
+              <div>
+                <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '4px' }}>Enrolled Students</p>
+                <p style={{ fontSize: '15px', fontWeight: '500', color: '#1e293b' }}>
+                  {enrolledStudents.length}
+                </p>
               </div>
-              <button type="submit" className="btn btn-primary" disabled={!selectedStudentId || studentsLoading}>
-                Enroll
-              </button>
-            </form>
+            </div>
           </div>
 
-          <div className="card">
-            <h2>Enrolled Students ({enrolledStudents.length})</h2>
-            {enrolledStudents.length === 0 ? (
-              <p>No students enrolled yet.</p>
-            ) : (
-              <ul>
-                {enrolledStudents.map((student) => (
-                  <li key={student._id} style={{ marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
-                    <span>{student.profile?.name || student.email}</span>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => handleRemoveStudent(student._id)}
-                      style={{ padding: '5px 10px', fontSize: '14px' }}
-                    >
-                      Remove
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          <div className="card">
-            <h2>Assignments ({assignments.length})</h2>
-            {assignments.length === 0 ? (
-              <p>No assignments yet.</p>
-            ) : (
-              <ul>
-                {assignments.map((assignment) => (
-                  <li key={assignment._id} style={{ marginBottom: '10px' }}>
-                    <a
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        navigate(`/teacher/assignments/${assignment._id}`);
-                      }}
-                      style={{ color: '#007bff', textDecoration: 'underline', cursor: 'pointer' }}
-                    >
-                      {assignment.title}
-                    </a>
-                    <span style={{ marginLeft: '10px', color: '#666' }}>
-                      Due: {new Date(assignment.dueDate).toLocaleDateString()}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <button
-              className="btn btn-primary"
-              onClick={() => navigate(`/teacher/assignments/new?courseId=${id}`)}
-              style={{ marginTop: '10px' }}
-            >
-              Create Assignment
-            </button>
-          </div>
-        </>
-      )}
-
-      {user?.role === 'student' && (
-        <div className="card">
-          <h2>Assignments ({assignments.length})</h2>
-          {assignments.length === 0 ? (
-            <p>No assignments yet.</p>
-          ) : (
-            <ul>
-              {assignments.map((assignment) => (
-                <li key={assignment._id} style={{ marginBottom: '10px' }}>
-                  <a
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigate(`/student/assignments/${assignment._id}`);
+          {user?.role === 'teacher' && (
+            <div style={{
+              backgroundColor: '#fff',
+              borderRadius: '12px',
+              padding: '24px',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              border: '1px solid #e2e8f0',
+            }}>
+              <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', marginBottom: '20px' }}>
+                Enroll Student
+              </h2>
+              <form onSubmit={handleEnrollStudent}>
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#1e293b', marginBottom: '8px' }}>
+                    Select Student
+                  </label>
+                  <select
+                    value={selectedStudentId}
+                    onChange={(e) => setSelectedStudentId(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      borderRadius: '8px',
+                      border: '1px solid #e2e8f0',
+                      fontSize: '14px',
                     }}
-                    style={{ color: '#007bff', textDecoration: 'underline', cursor: 'pointer' }}
                   >
-                    {assignment.title}
-                  </a>
-                  <span style={{ marginLeft: '10px', color: '#666' }}>
-                    Due: {new Date(assignment.dueDate).toLocaleDateString()}
-                  </span>
-                </li>
-              ))}
-            </ul>
+                    <option value="">Choose a student...</option>
+                    {unenrolledStudents.map((student) => (
+                      <option key={student._id} value={student._id}>
+                        {student.profile?.name || student.email}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  type="submit"
+                  style={{
+                    width: '100%',
+                    padding: '10px 16px',
+                    fontSize: '14px',
+                    backgroundColor: '#ff6600',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                  }}
+                >
+                  Enroll Student
+                </button>
+              </form>
+            </div>
           )}
         </div>
-      )}
-    </div>
+
+        {user?.role === 'teacher' && enrolledStudents.length > 0 && (
+          <div style={{
+            backgroundColor: '#fff',
+            borderRadius: '12px',
+            padding: '24px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+            border: '1px solid #e2e8f0',
+            marginBottom: '24px',
+          }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', marginBottom: '20px' }}>
+              Enrolled Students ({enrolledStudents.length})
+            </h2>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#64748b' }}>Name</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#64748b' }}>Email</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '14px', fontWeight: '600', color: '#64748b' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {enrolledStudents.map((student) => (
+                    <tr key={student._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '12px', fontSize: '14px', color: '#1e293b' }}>
+                        {student.profile?.name || student.email}
+                      </td>
+                      <td style={{ padding: '12px', fontSize: '14px', color: '#64748b' }}>
+                        {student.email}
+                      </td>
+                      <td style={{ padding: '12px' }}>
+                        <button
+                          onClick={() => handleRemoveStudent(student._id)}
+                          style={{
+                            padding: '6px 12px',
+                            fontSize: '13px',
+                            backgroundColor: 'transparent',
+                            color: '#ef4444',
+                            border: '1px solid #ef4444',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        <div style={{
+          backgroundColor: '#fff',
+          borderRadius: '12px',
+          padding: '24px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          border: '1px solid #e2e8f0',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b' }}>
+              Assignments ({assignments.length})
+            </h2>
+            {user?.role === 'teacher' && (
+              <button
+                onClick={() => navigate(`/teacher/assignments/new?courseId=${id}`)}
+                style={{
+                  padding: '10px 20px',
+                  fontSize: '14px',
+                  backgroundColor: '#ff6600',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                }}
+              >
+                Create Assignment
+              </button>
+            )}
+          </div>
+          {assignments.length === 0 ? (
+            <p style={{ color: '#64748b', fontSize: '14px' }}>No assignments yet.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {assignments.map((assignment) => (
+                <div
+                  key={assignment._id}
+                  style={{
+                    padding: '16px',
+                    backgroundColor: '#f8fafc',
+                    borderRadius: '8px',
+                    border: '1px solid #e2e8f0',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f1f5f9';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f8fafc';
+                  }}
+                  onClick={() => navigate(`/${user.role}/assignments/${assignment._id}`)}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                    <div>
+                      <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>
+                        {assignment.title}
+                      </h3>
+                      <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '4px' }}>
+                        Due: {new Date(assignment.dueDate).toLocaleDateString()}
+                      </p>
+                      <p style={{ fontSize: '13px', color: '#64748b' }}>
+                        Max Points: {assignment.maxPoints}
+                      </p>
+                    </div>
+                    {user?.role === 'teacher' && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/teacher/assignments/${assignment._id}/submissions`);
+                        }}
+                        style={{
+                          padding: '6px 12px',
+                          fontSize: '13px',
+                          backgroundColor: 'transparent',
+                          color: '#ff6600',
+                          border: '1px solid #ff6600',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        View Submissions
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </DashboardLayout>
   );
 };
 
 export default CourseDetail;
-

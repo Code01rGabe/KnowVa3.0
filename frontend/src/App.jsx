@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './utils/ProtectedRoute';
 import ThemeToggle from './components/ThemeToggle';
+import Notification from './components/Notification';
 import LandingPage from './components/landing/LandingPage';
 
 // Auth components
@@ -16,6 +17,10 @@ import TeacherDashboard from './components/dashboard/TeacherDashboard';
 import StudentDashboard from './components/dashboard/StudentDashboard';
 import ManageSchools from './components/admin/ManageSchools';
 import ManageUsers from './components/admin/ManageUsers';
+
+// Class components
+import ClassDetail from './components/classes/ClassDetail';
+import StudentProfile from './components/classes/StudentProfile';
 
 // Course components
 import CourseList from './components/courses/CourseList';
@@ -57,6 +62,7 @@ function App() {
   return (
     <AuthProvider>
       <ThemeToggle />
+      <Notification />
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -185,6 +191,22 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['teacher']}>
                 <GradeSubmission />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/classes/:classroomId"
+            element={
+              <ProtectedRoute allowedRoles={['teacher']}>
+                <ClassDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/students/:studentId"
+            element={
+              <ProtectedRoute allowedRoles={['teacher']}>
+                <StudentProfile />
               </ProtectedRoute>
             }
           />
