@@ -1,0 +1,200 @@
+.account-settings-container {
+  padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.settings-header {
+  margin-bottom: 32px;
+}
+
+.settings-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary, #1e293b);
+  margin-bottom: 8px;
+}
+
+.settings-header p {
+  color: var(--text-secondary, #64748b);
+  font-size: 16px;
+}
+
+.settings-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--border, #e2e8f0);
+  padding-bottom: 0;
+}
+
+.settings-tabs button {
+  padding: 12px 24px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-secondary, #64748b);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: -2px;
+}
+
+.settings-tabs button:hover {
+  color: var(--accent, #ff6600);
+}
+
+.settings-tabs button.active {
+  color: var(--accent, #ff6600);
+  border-bottom-color: var(--accent, #ff6600);
+}
+
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.settings-card {
+  background: var(--card-bg, #fff);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 2px 8px var(--shadow, rgba(0,0,0,0.1));
+  border: 1px solid var(--border, #e2e8f0);
+}
+
+.settings-card h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary, #1e293b);
+  margin-bottom: 24px;
+}
+
+.settings-card .form-group {
+  margin-bottom: 24px;
+}
+
+.settings-card .form-group label {
+  display: block;
+  font-weight: 600;
+  color: var(--text-primary, #1e293b);
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.settings-card .form-group input,
+.settings-card .form-group select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 8px;
+  font-size: 15px;
+  color: var(--text-primary, #1e293b);
+  background: var(--bg-primary, #fff);
+  transition: all 0.2s ease;
+}
+
+.settings-card .form-group input:focus,
+.settings-card .form-group select:focus {
+  outline: none;
+  border-color: var(--accent, #ff6600);
+  box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.1);
+}
+
+.settings-card .form-group input:disabled {
+  background: var(--bg-secondary, #f1f5f9);
+  cursor: not-allowed;
+}
+
+.settings-card .form-group small {
+  display: block;
+  color: var(--text-secondary, #64748b);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.settings-card .btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.settings-card .btn-primary {
+  background: var(--accent, #ff6600);
+  color: #fff;
+}
+
+.settings-card .btn-primary:hover {
+  background: var(--accent-hover, #e55a00);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 102, 0, 0.3);
+}
+
+.settings-card .btn-danger {
+  background: #ef4444;
+  color: #fff;
+}
+
+.settings-card .btn-danger:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.danger-zone {
+  border: 2px solid #fee2e2;
+  background: #fef2f2;
+}
+
+.danger-zone h2 {
+  color: #dc2626;
+}
+
+.danger-zone p {
+  color: var(--text-secondary, #64748b);
+  margin-bottom: 16px;
+}
+
+.message {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.message.success {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+}
+
+.message.error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+@media (max-width: 768px) {
+  .account-settings-container {
+    padding: 16px;
+  }
+
+  .settings-card {
+    padding: 24px;
+  }
+
+  .settings-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .settings-tabs button {
+    white-space: nowrap;
+  }
+}
+

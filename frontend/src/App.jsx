@@ -37,6 +37,9 @@ import SubmissionForm from './components/submissions/SubmissionForm';
 import SubmissionList from './components/submissions/SubmissionList';
 import GradeSubmission from './components/submissions/GradeSubmission';
 
+// Settings components
+import AccountSettings from './components/settings/AccountSettings';
+
 const Home = () => {
   const { user } = useAuth();
 
@@ -257,6 +260,16 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['student']}>
                 <SubmissionForm />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Settings Routes - Available to all authenticated users */}
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'schoolRep', 'teacher', 'student']}>
+                <AccountSettings />
               </ProtectedRoute>
             }
           />

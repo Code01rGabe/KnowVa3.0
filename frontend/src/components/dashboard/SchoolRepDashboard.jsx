@@ -11,6 +11,9 @@ const tabs = [
   { id: 'analytics', label: 'Analytics' },
   { id: 'settings', label: 'School Settings' },
   { id: 'communications', label: 'Communications' },
+  { id: 'billing', label: 'Subscription & Billing' },
+  { id: 'security', label: 'Security Center' },
+  { id: 'support', label: 'Support Desk' },
 ];
 
 const SchoolRepDashboard = () => {
@@ -37,15 +40,21 @@ const SchoolRepDashboard = () => {
     gradingSystem: 'percentage',
   });
   const [announcement, setAnnouncement] = useState({ title: '', message: '' });
+  const [supportTickets, setSupportTickets] = useState([]);
+  const [newTicket, setNewTicket] = useState({ subject: '', description: '', priority: 'medium' });
 
   useEffect(() => {
-    loadAll();
-  }, []);
+    if (user) {
+      loadAll();
+    }
+  }, [user]);
 
   const loadAll = async () => {
     try {
       setLoading(true);
-      await Promise.all([
+      setMessage('');
+      console.log('Loading school rep dashboard data...');
+      const results = await Promise.allSettled([
         loadSchoolData(),
         loadStats(),
         loadPeople(),
@@ -56,25 +65,55 @@ const SchoolRepDashboard = () => {
         loadAnalytics(),
         loadSettings(),
       ]);
+      
+      // Check for failures
+      const failures = results.filter(r => r.status === 'rejected');
+      if (failures.length > 0) {
+        console.warn('Some data failed to load:', failures);
+        setMessage(`Some data failed to load (${failures.length} errors). Please refresh the page.`);
+      } else {
+        console.log('All school rep dashboard data loaded successfully');
+      }
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+      setMessage('Failed to load dashboard data. Please check your connection and refresh the page.');
     } finally {
       setLoading(false);
     }
   };
 
   const loadSchoolData = async () => {
-    const response = await api.get('/school');
-    setSchool(response.data.school);
+    try {
+      const response = await api.get('/school');
+      setSchool(response.data.school);
+    } catch (error) {
+      console.error('Error loading school data:', error);
+      throw error;
+    }
   };
 
   const loadStats = async () => {
-    const response = await api.get('/school/stats');
-    setStats(response.data.stats);
+    try {
+      console.log('Loading school stats...');
+      const response = await api.get('/school/stats');
+      console.log('School stats loaded:', response.data);
+      setStats(response.data.stats);
+    } catch (error) {
+      console.error('Error loading stats:', error);
+      console.error('Error details:', error.response?.data);
+      throw error;
+    }
   };
 
   const loadPeople = async () => {
-    const [studentsRes, teachersRes] = await Promise.all([api.get('/school/students'), api.get('/school/teachers')]);
-    setStudents(studentsRes.data.students || []);
-    setTeachers(teachersRes.data.teachers || []);
+    try {
+      const [studentsRes, teachersRes] = await Promise.all([api.get('/school/students'), api.get('/school/teachers')]);
+      setStudents(studentsRes.data.students || []);
+      setTeachers(teachersRes.data.teachers || []);
+    } catch (error) {
+      console.error('Error loading people:', error);
+      throw error;
+    }
   };
 
   const loadClassrooms = async () => {
@@ -90,38 +129,63 @@ const SchoolRepDashboard = () => {
   };
 
   const loadSubjects = async () => {
-    const response = await api.get('/school/subjects');
-    setSubjects(response.data.data || []);
+    try {
+      const response = await api.get('/school/subjects');
+      setSubjects(response.data.data || []);
+    } catch (error) {
+      console.error('Error loading subjects:', error);
+      throw error;
+    }
   };
 
   const loadMaterials = async () => {
-    const response = await api.get('/school/materials');
-    setMaterials(response.data.data || []);
+    try {
+      const response = await api.get('/school/materials');
+      setMaterials(response.data.data || []);
+    } catch (error) {
+      console.error('Error loading materials:', error);
+      throw error;
+    }
   };
 
   const loadAttendance = async () => {
-    const response = await api.get('/school/attendance');
-    setAttendance(response.data.data || []);
+    try {
+      const response = await api.get('/school/attendance');
+      setAttendance(response.data.data || []);
+    } catch (error) {
+      console.error('Error loading attendance:', error);
+      throw error;
+    }
   };
 
   const loadAnalytics = async () => {
-    const response = await api.get('/school/analytics');
-    setAnalytics(response.data);
+    try {
+      const response = await api.get('/school/analytics');
+      setAnalytics(response.data);
+    } catch (error) {
+      console.error('Error loading analytics:', error);
+      throw error;
+    }
   };
 
   const loadSettings = async () => {
-    const response = await api.get('/school/settings');
-    setSettings(response.data.settings);
-    setSettingsForm({
-      branding: {
-        platformName: response.data.settings?.branding?.platformName || response.data.settings?.name || 'Our School',
-        logoUrl: response.data.settings?.branding?.logoUrl || '',
-        primaryColor: response.data.settings?.branding?.primaryColor || '#ff6600',
-        secondaryColor: response.data.settings?.branding?.secondaryColor || '#2d1b3d',
-        motto: response.data.settings?.branding?.motto || '',
-      },
-      gradingSystem: response.data.settings?.gradingSystem || 'percentage',
-    });
+    try {
+      const response = await api.get('/school/settings');
+      setSettings(response.data.settings);
+      setSettingsForm({
+        branding: {
+          platformName: response.data.settings?.branding?.platformName || response.data.settings?.name || 'Our School',
+          logoUrl: response.data.settings?.branding?.logoUrl || '',
+          primaryColor: response.data.settings?.branding?.primaryColor || '#ff6600',
+          secondaryColor: response.data.settings?.branding?.secondaryColor || '#2d1b3d',
+          motto: response.data.settings?.branding?.motto || '',
+        },
+        gradingSystem: response.data.settings?.gradingSystem || 'percentage',
+      });
+    } catch (error) {
+      console.error('Error loading settings:', error);
+      throw error;
+    }
   };
 
   const regenerateCode = async (type) => {
@@ -233,11 +297,18 @@ const SchoolRepDashboard = () => {
     setAnnouncement({ title: '', message: '' });
   };
 
-  if (loading) {
+  if (!user || loading) {
     return (
       <DashboardLayout>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-          <p>Loading...</p>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: '18px', color: 'var(--text-secondary, #64748b)', marginBottom: '12px' }}>
+              {!user ? 'Please log in...' : 'Loading dashboard...'}
+            </p>
+            {user && (
+              <div style={{ width: '40px', height: '40px', border: '4px solid var(--border, #e2e8f0)', borderTop: '4px solid var(--accent, #ff6600)', borderRadius: '50%', margin: '0 auto', animation: 'spin 1s linear infinite' }}></div>
+            )}
+          </div>
         </div>
       </DashboardLayout>
     );
@@ -245,16 +316,28 @@ const SchoolRepDashboard = () => {
 
   const statCards = stats
     ? [
-        { label: 'Students', value: stats.students },
-        { label: 'Teachers', value: stats.teachers },
-        { label: 'Courses', value: stats.courses },
-        { label: 'Assignments', value: stats.assignments },
-        { label: 'Pending Submissions', value: stats.pendingSubmissions },
+        { label: 'Students', value: stats.students ?? 0 },
+        { label: 'Teachers', value: stats.teachers ?? 0 },
+        { label: 'Courses', value: stats.courses ?? 0 },
+        { label: 'Assignments', value: stats.assignments ?? 0 },
+        { label: 'Pending Submissions', value: stats.pendingSubmissions ?? 0 },
       ]
     : [];
 
   const renderOverview = () => (
     <>
+      {message && (
+        <div style={{
+          marginBottom: '24px',
+          padding: '12px 16px',
+          borderRadius: '8px',
+          backgroundColor: message.toLowerCase().includes('error') ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+          color: message.toLowerCase().includes('error') ? 'var(--error, #ef4444)' : 'var(--success, #10b981)',
+          border: `1px solid ${message.toLowerCase().includes('error') ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'}`,
+        }}>
+          {message}
+        </div>
+      )}
       <div style={{ 
         display: 'grid', 
         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
@@ -616,9 +699,188 @@ const SchoolRepDashboard = () => {
         </div>
         <button className="btn btn-primary">Send Announcement</button>
       </form>
-      <p style={{ marginTop: 20, color: 'var(--text-secondary)' }}>
-        Support tickets, device usage, and compliance monitoring will appear here once connected to the relevant services.
+    </div>
+  );
+
+  const renderBilling = () => (
+    <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+      <div style={{ fontSize: '64px', marginBottom: '24px' }}>💳</div>
+      <h2 style={{ fontSize: '28px', fontWeight: '700', color: 'var(--text-primary, #1e293b)', marginBottom: '12px' }}>
+        Coming Soon
+      </h2>
+      <p style={{ color: 'var(--text-secondary, #64748b)', fontSize: '16px', maxWidth: '500px', margin: '0 auto' }}>
+        Subscription and billing management will be available soon. You'll be able to manage your plan, view invoices, and update payment methods.
       </p>
+    </div>
+  );
+
+  const renderSecurity = () => (
+    <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+      <div style={{ fontSize: '64px', marginBottom: '24px' }}>🔒</div>
+      <h2 style={{ fontSize: '28px', fontWeight: '700', color: 'var(--text-primary, #1e293b)', marginBottom: '12px' }}>
+        Coming Soon
+      </h2>
+      <p style={{ color: 'var(--text-secondary, #64748b)', fontSize: '16px', maxWidth: '500px', margin: '0 auto' }}>
+        Security center features including audit logs, login history, and permission management will be available soon.
+      </p>
+    </div>
+  );
+
+  const handleCreateTicket = (e) => {
+    e.preventDefault();
+    const ticket = {
+      id: Date.now().toString(),
+      subject: newTicket.subject,
+      description: newTicket.description,
+      priority: newTicket.priority,
+      status: 'open',
+      createdAt: new Date().toISOString(),
+      createdBy: user?.email || 'Unknown',
+    };
+    setSupportTickets([ticket, ...supportTickets]);
+    setNewTicket({ subject: '', description: '', priority: 'medium' });
+    setMessage('Support ticket created successfully!');
+    setTimeout(() => setMessage(''), 3000);
+  };
+
+  const renderSupport = () => (
+    <div>
+      <h2 style={{ fontSize: '24px', fontWeight: '700', color: 'var(--text-primary, #1e293b)', marginBottom: '24px' }}>
+        Support Desk
+      </h2>
+      
+      <div style={{ marginBottom: '32px' }}>
+        <h3 style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-primary, #1e293b)', marginBottom: '16px' }}>
+          Create New Ticket
+        </h3>
+        <form onSubmit={handleCreateTicket} style={{ 
+          backgroundColor: 'var(--bg-secondary, #f8fafc)', 
+          padding: '24px', 
+          borderRadius: '12px',
+          border: '1px solid var(--border, #e2e8f0)',
+        }}>
+          <div className="form-group">
+            <label>Subject</label>
+            <input
+              type="text"
+              value={newTicket.subject}
+              onChange={(e) => setNewTicket({ ...newTicket, subject: e.target.value })}
+              placeholder="Brief description of your issue"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Description</label>
+            <textarea
+              value={newTicket.description}
+              onChange={(e) => setNewTicket({ ...newTicket, description: e.target.value })}
+              placeholder="Provide detailed information about your issue"
+              rows="5"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Priority</label>
+            <select
+              value={newTicket.priority}
+              onChange={(e) => setNewTicket({ ...newTicket, priority: e.target.value })}
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+          <button type="submit" className="btn btn-primary">
+            Create Ticket
+          </button>
+        </form>
+      </div>
+
+      <div>
+        <h3 style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-primary, #1e293b)', marginBottom: '16px' }}>
+          Your Tickets ({supportTickets.length})
+        </h3>
+        {supportTickets.length === 0 ? (
+          <div style={{ 
+            textAlign: 'center', 
+            padding: '40px 20px',
+            backgroundColor: 'var(--bg-secondary, #f8fafc)',
+            borderRadius: '12px',
+            border: '1px solid var(--border, #e2e8f0)',
+          }}>
+            <p style={{ color: 'var(--text-secondary, #64748b)' }}>No support tickets yet. Create one above to get help.</p>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {supportTickets.map((ticket) => (
+              <div
+                key={ticket.id}
+                style={{
+                  backgroundColor: 'var(--card-bg, #fff)',
+                  padding: '20px',
+                  borderRadius: '12px',
+                  border: '1px solid var(--border, #e2e8f0)',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                  <div style={{ flex: 1 }}>
+                    <h4 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary, #1e293b)', marginBottom: '4px' }}>
+                      {ticket.subject}
+                    </h4>
+                    <p style={{ fontSize: '14px', color: 'var(--text-secondary, #64748b)', marginBottom: '8px' }}>
+                      {ticket.description}
+                    </p>
+                    <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: 'var(--text-secondary, #64748b)' }}>
+                      <span>Created: {new Date(ticket.createdAt).toLocaleDateString()}</span>
+                      <span>By: {ticket.createdBy}</span>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
+                    <span
+                      style={{
+                        padding: '4px 12px',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        backgroundColor:
+                          ticket.status === 'open' ? '#dbeafe' :
+                          ticket.status === 'in-progress' ? '#fef3c7' :
+                          ticket.status === 'resolved' ? '#d1fae5' : '#f3f4f6',
+                        color:
+                          ticket.status === 'open' ? '#1e40af' :
+                          ticket.status === 'in-progress' ? '#92400e' :
+                          ticket.status === 'resolved' ? '#065f46' : '#374151',
+                      }}
+                    >
+                      {ticket.status.toUpperCase()}
+                    </span>
+                    <span
+                      style={{
+                        padding: '4px 12px',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        backgroundColor:
+                          ticket.priority === 'urgent' ? '#fee2e2' :
+                          ticket.priority === 'high' ? '#fecaca' :
+                          ticket.priority === 'medium' ? '#fef3c7' : '#e0e7ff',
+                        color:
+                          ticket.priority === 'urgent' ? '#991b1b' :
+                          ticket.priority === 'high' ? '#b91c1c' :
+                          ticket.priority === 'medium' ? '#92400e' : '#1e40af',
+                      }}
+                    >
+                      {ticket.priority.toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 
@@ -630,16 +892,19 @@ const SchoolRepDashboard = () => {
     analytics: renderAnalytics(),
     settings: renderSettings(),
     communications: renderCommunications(),
+    billing: renderBilling(),
+    security: renderSecurity(),
+    support: renderSupport(),
   };
 
   return (
     <DashboardLayout>
       <div>
         <div style={{ marginBottom: '32px' }}>
-          <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#1e293b', marginBottom: '8px' }}>
+          <h1 style={{ fontSize: '36px', fontWeight: '800', color: 'var(--text-primary, #1e293b)', marginBottom: '12px', lineHeight: '1.2' }}>
             {school?.name || 'Your School'}
           </h1>
-          <p style={{ color: '#64748b', fontSize: '16px' }}>
+          <p style={{ color: 'var(--text-secondary, #64748b)', fontSize: '16px', fontWeight: '500' }}>
             Manage classes, subjects, attendance, analytics, and communications.
           </p>
         </div>
@@ -651,12 +916,12 @@ const SchoolRepDashboard = () => {
               borderRadius: '8px',
               marginBottom: '24px',
               backgroundColor: message.toLowerCase().includes('unable') || message.toLowerCase().includes('error')
-                ? 'rgba(239, 68, 68, 0.1)'
-                : 'rgba(16, 185, 129, 0.1)',
+                ? 'rgba(239, 68, 68, 0.15)'
+                : 'rgba(16, 185, 129, 0.15)',
               color: message.toLowerCase().includes('unable') || message.toLowerCase().includes('error')
-                ? '#dc2626'
-                : '#059669',
-              border: `1px solid ${message.toLowerCase().includes('unable') || message.toLowerCase().includes('error') ? '#fecaca' : '#a7f3d0'}`,
+                ? 'var(--error, #dc2626)'
+                : 'var(--success, #059669)',
+              border: `1px solid ${message.toLowerCase().includes('unable') || message.toLowerCase().includes('error') ? 'rgba(239, 68, 68, 0.3)' : 'rgba(16, 185, 129, 0.3)'}`,
             }}
           >
             {message}
@@ -669,7 +934,7 @@ const SchoolRepDashboard = () => {
           flexWrap: 'wrap',
           marginBottom: '24px',
           paddingBottom: '16px',
-          borderBottom: '2px solid #e2e8f0',
+          borderBottom: '2px solid var(--border, #e2e8f0)',
         }}>
           {tabs.map((tab) => (
             <button
@@ -679,9 +944,9 @@ const SchoolRepDashboard = () => {
                 padding: '10px 20px',
                 fontSize: '14px',
                 fontWeight: '500',
-                backgroundColor: activeTab === tab.id ? '#ff6600' : 'transparent',
-                color: activeTab === tab.id ? '#fff' : '#64748b',
-                border: `1px solid ${activeTab === tab.id ? '#ff6600' : '#e2e8f0'}`,
+                backgroundColor: activeTab === tab.id ? 'var(--accent, #ff6600)' : 'transparent',
+                color: activeTab === tab.id ? '#fff' : 'var(--text-secondary, #64748b)',
+                border: `1px solid ${activeTab === tab.id ? 'var(--accent, #ff6600)' : 'var(--border, #e2e8f0)'}`,
                 borderRadius: '8px',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
@@ -705,11 +970,11 @@ const SchoolRepDashboard = () => {
         </div>
 
         <div style={{
-          backgroundColor: '#fff',
-          borderRadius: '12px',
-          padding: '24px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          border: '1px solid #e2e8f0',
+          backgroundColor: 'var(--card-bg, #fff)',
+          borderRadius: '16px',
+          padding: '32px',
+          boxShadow: '0 4px 12px var(--shadow, rgba(0,0,0,0.1))',
+          border: '1px solid var(--border, #e2e8f0)',
         }}>
           {tabContent[activeTab]}
         </div>

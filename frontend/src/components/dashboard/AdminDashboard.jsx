@@ -21,6 +21,8 @@ const AdminDashboard = () => {
   const [schoolsPreview, setSchoolsPreview] = useState([]);
   const [settingsMessage, setSettingsMessage] = useState('');
   const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [featureFlags, setFeatureFlags] = useState({
     submissions: true,
     messaging: true,
@@ -38,16 +40,38 @@ const AdminDashboard = () => {
   const [announcementStatus, setAnnouncementStatus] = useState('');
 
   useEffect(() => {
-    loadStats();
-    loadPreviewSchools();
-  }, []);
+    if (user) {
+      loadAll();
+    }
+  }, [user]);
+
+  const loadAll = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      await Promise.all([
+        loadStats(),
+        loadPreviewSchools(),
+      ]);
+    } catch (err) {
+      console.error('Error loading dashboard:', err);
+      setError('Failed to load dashboard data. Please refresh the page.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const loadStats = async () => {
     try {
+      console.log('Loading admin stats...');
       const response = await api.get('/admin/stats');
+      console.log('Admin stats loaded:', response.data);
       setStats(response.data);
     } catch (error) {
       console.error('Error loading dashboard stats:', error);
+      console.error('Error details:', error.response?.data);
+      setError(error.response?.data?.message || 'Failed to load statistics. Please check your connection.');
+      throw error;
     }
   };
 
@@ -57,6 +81,7 @@ const AdminDashboard = () => {
       setSchoolsPreview(response.data.data || []);
     } catch (error) {
       console.error('Error previewing schools:', error);
+      // Don't throw here, just log - schools preview is not critical
     }
   };
 
@@ -92,29 +117,88 @@ const AdminDashboard = () => {
 
   const statCards = stats?.stats
     ? [
-        { label: 'Schools', value: stats.stats.totalSchools },
-        { label: 'Active Schools', value: stats.stats.activeSchools },
-        { label: 'Users', value: stats.stats.totalUsers },
-        { label: 'Teachers', value: stats.stats.teachers },
-        { label: 'Students', value: stats.stats.students },
-        { label: 'Courses', value: stats.stats.totalCourses },
-        { label: 'Assignments', value: stats.stats.totalAssignments },
-        { label: 'Pending Submissions', value: stats.stats.pendingSubmissions },
-        { label: 'Avg Students/Course', value: stats.stats.avgStudentsPerCourse },
+        { label: 'Schools', value: stats.stats.totalSchools ?? 0 },
+        { label: 'Active Schools', value: stats.stats.activeSchools ?? 0 },
+        { label: 'Users', value: stats.stats.totalUsers ?? 0 },
+        { label: 'Teachers', value: stats.stats.teachers ?? 0 },
+        { label: 'Students', value: stats.stats.students ?? 0 },
+        { label: 'Courses', value: stats.stats.totalCourses ?? 0 },
+        { label: 'Assignments', value: stats.stats.totalAssignments ?? 0 },
+        { label: 'Pending Submissions', value: stats.stats.pendingSubmissions ?? 0 },
+        { label: 'Avg Students/Course', value: stats.stats.avgStudentsPerCourse ?? 0 },
       ]
     : [];
+
+  if (!user || loading) {
+    return (
+      <DashboardLayout>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: '18px', color: 'var(--text-secondary, #64748b)', marginBottom: '12px' }}>
+              {!user ? 'Please log in...' : 'Loading dashboard...'}
+            </p>
+            {user && (
+              <div style={{ width: '40px', height: '40px', border: '4px solid var(--border, #e2e8f0)', borderTop: '4px solid var(--accent, #ff6600)', borderRadius: '50%', margin: '0 auto', animation: 'spin 1s linear infinite' }}></div>
+            )}
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
       <div>
-        <div style={{ marginBottom: '32px' }}>
-          <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#1e293b', marginBottom: '8px' }}>
-            Dashboard
-          </h1>
-          <p style={{ color: '#64748b', fontSize: '16px' }}>
-            Platform Command Center - Oversee every school, user, and system feature
-          </p>
+        {/* Welcome Card */}
+        <div style={{
+          backgroundColor: 'var(--pastel-pink, #ffd6e8)',
+          borderRadius: '24px',
+          padding: '48px',
+          marginBottom: '32px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          boxShadow: '0 8px 24px rgba(255, 214, 232, 0.4)',
+          border: '1px solid rgba(255, 214, 232, 0.6)',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <p style={{ fontSize: '14px', color: 'var(--text-secondary, #64748b)', marginBottom: '8px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              Welcome
+            </p>
+            <h1 style={{ fontSize: '42px', fontWeight: '800', color: 'var(--text-primary, #1e293b)', marginBottom: '20px', lineHeight: '1.2' }}>
+              {user?.profile?.name || user?.email || 'Admin'}
+            </h1>
+            <div style={{
+              display: 'inline-block',
+              padding: '8px 20px',
+              borderRadius: '24px',
+              backgroundColor: 'rgba(255, 255, 255, 0.85)',
+              border: '1px solid rgba(255, 255, 255, 0.95)',
+              fontSize: '14px',
+              color: 'var(--text-primary, #1e293b)',
+              fontWeight: '600',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            }}>
+              Platform Admin
+            </div>
+          </div>
+          <div style={{ fontSize: '140px', opacity: 0.25, position: 'relative', zIndex: 0 }}>👋</div>
         </div>
+
+        {error && (
+          <div style={{
+            marginBottom: '24px',
+            padding: '12px 16px',
+            borderRadius: '12px',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            color: 'var(--error, #ef4444)',
+            border: '1px solid rgba(239, 68, 68, 0.2)',
+          }}>
+            {error}
+          </div>
+        )}
 
         <div style={{ 
           display: 'grid', 
@@ -129,41 +213,53 @@ const AdminDashboard = () => {
               <div
                 key={card.label}
                 style={{
-                  backgroundColor: '#fff',
-                  borderRadius: '12px',
-                  padding: '24px',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                  border: '1px solid #e2e8f0',
-                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                  backgroundColor: 'var(--card-bg, #fff)',
+                  borderRadius: '16px',
+                  padding: '28px',
+                  boxShadow: '0 2px 8px var(--shadow, rgba(0,0,0,0.1))',
+                  border: '1px solid var(--border, #e2e8f0)',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  position: 'relative',
+                  overflow: 'hidden',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                  e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
+                  e.currentTarget.style.boxShadow = '0 8px 24px var(--shadow, rgba(0,0,0,0.15))';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px var(--shadow, rgba(0,0,0,0.1))';
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                   <div style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '10px',
-                    backgroundColor: `${colors[index % colors.length]}15`,
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '14px',
+                    background: `linear-gradient(135deg, ${colors[index % colors.length]}20, ${colors[index % colors.length]}10)`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '24px',
+                    fontSize: '28px',
+                    boxShadow: `0 4px 12px ${colors[index % colors.length]}25`,
                   }}>
                     {icons[index % icons.length]}
                   </div>
                 </div>
                 <div>
-                  <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '8px', fontWeight: '500' }}>
+                  <p style={{ fontSize: '13px', color: 'var(--text-secondary, #64748b)', marginBottom: '10px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     {card.label}
                   </p>
-                  <p style={{ fontSize: '32px', fontWeight: '700', color: '#1e293b' }}>
+                  <p style={{ 
+                    fontSize: '40px', 
+                    fontWeight: '800', 
+                    color: 'var(--text-primary, #1e293b)', 
+                    background: `linear-gradient(135deg, ${colors[index % colors.length]}, ${colors[(index + 1) % colors.length]})`, 
+                    WebkitBackgroundClip: 'text', 
+                    WebkitTextFillColor: 'transparent', 
+                    backgroundClip: 'text',
+                    lineHeight: '1.2',
+                  }}>
                     {card.value ?? 0}
                   </p>
                 </div>
@@ -182,26 +278,30 @@ const AdminDashboard = () => {
             <div
               key={card.title}
               style={{
-                backgroundColor: '#fff',
-                borderRadius: '12px',
-                padding: '24px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                border: '1px solid #e2e8f0',
-                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                backgroundColor: 'var(--card-bg, #fff)',
+                borderRadius: '16px',
+                padding: '28px',
+                boxShadow: '0 2px 8px var(--shadow, rgba(0,0,0,0.1))',
+                border: '1px solid var(--border, #e2e8f0)',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                position: 'relative',
+                overflow: 'hidden',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = '0 8px 24px var(--shadow, rgba(0,0,0,0.15))';
+                e.currentTarget.style.borderColor = 'var(--accent, #ff6600)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+                e.currentTarget.style.boxShadow = '0 2px 8px var(--shadow, rgba(0,0,0,0.1))';
+                e.currentTarget.style.borderColor = 'var(--border, #e2e8f0)';
               }}
             >
-              <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>
+              <h3 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--text-primary, #1e293b)', marginBottom: '10px' }}>
                 {card.title}
               </h3>
-              <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '16px' }}>
+              <p style={{ fontSize: '14px', color: 'var(--text-secondary, #64748b)', marginBottom: '20px', lineHeight: '1.6' }}>
                 {card.subtitle}
               </p>
               {card.target.startsWith('/admin') ? (
@@ -244,15 +344,15 @@ const AdminDashboard = () => {
         </div>
 
         <div id="system-settings" style={{
-          backgroundColor: '#fff',
-          borderRadius: '12px',
-          padding: '24px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          border: '1px solid #e2e8f0',
+          backgroundColor: 'var(--card-bg, #fff)',
+          borderRadius: '16px',
+          padding: '32px',
+          boxShadow: '0 2px 8px var(--shadow, rgba(0,0,0,0.1))',
+          border: '1px solid var(--border, #e2e8f0)',
           marginBottom: '32px',
         }}>
-        <h2>System Settings</h2>
-        <p style={{ color: 'var(--text-secondary)' }}>
+        <h2 style={{ fontSize: '24px', fontWeight: '700', color: 'var(--text-primary, #1e293b)', marginBottom: '12px' }}>System Settings</h2>
+        <p style={{ color: 'var(--text-secondary, #64748b)', marginBottom: '24px' }}>
           UI demo — wire these controls to the platform settings service to persist branding, maintenance mode, and feature flags.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginTop: '20px' }}>
@@ -292,14 +392,14 @@ const AdminDashboard = () => {
       </div>
 
         <div id="announcements" style={{
-          backgroundColor: '#fff',
-          borderRadius: '12px',
-          padding: '24px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          border: '1px solid #e2e8f0',
+          backgroundColor: 'var(--card-bg, #fff)',
+          borderRadius: '16px',
+          padding: '32px',
+          boxShadow: '0 2px 8px var(--shadow, rgba(0,0,0,0.1))',
+          border: '1px solid var(--border, #e2e8f0)',
           marginBottom: '32px',
         }}>
-        <h2>Global Announcements</h2>
+        <h2 style={{ fontSize: '24px', fontWeight: '700', color: 'var(--text-primary, #1e293b)', marginBottom: '24px' }}>Global Announcements</h2>
         <form onSubmit={handleAnnouncementSend}>
           <div className="form-group">
             <label>Title</label>
@@ -341,13 +441,13 @@ const AdminDashboard = () => {
       </div>
 
         <div style={{
-          backgroundColor: '#fff',
-          borderRadius: '12px',
-          padding: '24px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          border: '1px solid #e2e8f0',
+          backgroundColor: 'var(--card-bg, #fff)',
+          borderRadius: '16px',
+          padding: '32px',
+          boxShadow: '0 2px 8px var(--shadow, rgba(0,0,0,0.1))',
+          border: '1px solid var(--border, #e2e8f0)',
         }}>
-          <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', marginBottom: '20px' }}>Most Active Schools</h2>
+          <h2 style={{ fontSize: '24px', fontWeight: '700', color: 'var(--text-primary, #1e293b)', marginBottom: '24px' }}>Most Active Schools</h2>
         {schoolsPreview.length === 0 ? (
           <p>No schools yet.</p>
         ) : (

@@ -9,27 +9,45 @@ const TeacherDashboard = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    loadDashboard();
-  }, []);
+    if (user) {
+      loadDashboard();
+    }
+  }, [user]);
 
   const loadDashboard = async () => {
     try {
+      setLoading(true);
+      setError('');
+      console.log('Loading teacher dashboard...');
       const response = await api.get('/dashboard/teacher');
+      console.log('Teacher dashboard loaded:', response.data);
       setStats(response.data);
     } catch (error) {
       console.error('Error loading dashboard stats:', error);
+      console.error('Error details:', error.response?.data);
+      setError(error.response?.data?.message || 'Failed to load dashboard data. Please check your connection.');
+      // Set empty stats so the dashboard still renders
+      setStats({ metrics: {}, classrooms: [], recentCourses: [], upcomingAssignments: [] });
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) {
+  if (!user || loading) {
     return (
       <DashboardLayout>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-          <p>Loading...</p>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: '18px', color: 'var(--text-secondary, #64748b)', marginBottom: '12px' }}>
+              {!user ? 'Please log in...' : 'Loading dashboard...'}
+            </p>
+            {user && (
+              <div style={{ width: '40px', height: '40px', border: '4px solid var(--border, #e2e8f0)', borderTop: '4px solid var(--accent, #ff6600)', borderRadius: '50%', margin: '0 auto', animation: 'spin 1s linear infinite' }}></div>
+            )}
+          </div>
         </div>
       </DashboardLayout>
     );
@@ -39,25 +57,25 @@ const TeacherDashboard = () => {
     ? [
         { 
           label: 'Classes', 
-          value: stats.metrics.classroomCount || 0, 
+          value: stats.metrics.classroomCount ?? 0, 
           color: '#3b82f6',
           icon: '🏫'
         },
         { 
           label: 'Courses', 
-          value: stats.metrics.courseCount,
+          value: stats.metrics.courseCount ?? 0,
           color: '#10b981',
           icon: '📚'
         },
         { 
           label: 'Students', 
-          value: stats.metrics.studentCount,
+          value: stats.metrics.studentCount ?? 0,
           color: '#f59e0b',
           icon: '👥'
         },
         { 
           label: 'Pending Submissions', 
-          value: stats.metrics.pendingSubmissions,
+          value: stats.metrics.pendingSubmissions ?? 0,
           color: '#ef4444',
           icon: '📝'
         },
@@ -67,15 +85,56 @@ const TeacherDashboard = () => {
   return (
     <DashboardLayout>
       <div>
-        {/* Header */}
-        <div style={{ marginBottom: '32px' }}>
-          <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#1e293b', marginBottom: '8px' }}>
-            Dashboard
-          </h1>
-          <p style={{ color: '#64748b', fontSize: '16px' }}>
-            Welcome back, {user?.profile?.name || 'Educator'}
-          </p>
+        {/* Welcome Card */}
+        <div style={{
+          backgroundColor: 'var(--pastel-blue, #d6e5ff)',
+          borderRadius: '24px',
+          padding: '48px',
+          marginBottom: '32px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          boxShadow: '0 8px 24px rgba(214, 229, 255, 0.4)',
+          border: '1px solid rgba(214, 229, 255, 0.6)',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <p style={{ fontSize: '14px', color: 'var(--text-secondary, #64748b)', marginBottom: '8px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              Welcome
+            </p>
+            <h1 style={{ fontSize: '42px', fontWeight: '800', color: 'var(--text-primary, #1e293b)', marginBottom: '20px', lineHeight: '1.2' }}>
+              {user?.profile?.name || user?.email || 'Teacher'}
+            </h1>
+            <div style={{
+              display: 'inline-block',
+              padding: '8px 20px',
+              borderRadius: '24px',
+              backgroundColor: 'rgba(255, 255, 255, 0.85)',
+              border: '1px solid rgba(255, 255, 255, 0.95)',
+              fontSize: '14px',
+              color: 'var(--text-primary, #1e293b)',
+              fontWeight: '600',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            }}>
+              Educator
+            </div>
+          </div>
+          <div style={{ fontSize: '140px', opacity: 0.25, position: 'relative', zIndex: 0 }}>👨‍🏫</div>
         </div>
+
+        {error && (
+          <div style={{
+            marginBottom: '24px',
+            padding: '12px 16px',
+            borderRadius: '12px',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            color: 'var(--error, #ef4444)',
+            border: '1px solid rgba(239, 68, 68, 0.2)',
+          }}>
+            {error}
+          </div>
+        )}
 
         {/* Metric Cards */}
         <div style={{ 
@@ -88,20 +147,22 @@ const TeacherDashboard = () => {
             <div
               key={card.label}
               style={{
-                backgroundColor: '#fff',
-                borderRadius: '12px',
-                padding: '24px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                border: '1px solid #e2e8f0',
-                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                backgroundColor: 'var(--card-bg, #fff)',
+                borderRadius: '16px',
+                padding: '28px',
+                boxShadow: '0 4px 12px var(--shadow, rgba(0,0,0,0.1))',
+                border: '1px solid var(--border, #e2e8f0)',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
+                e.currentTarget.style.boxShadow = '0 8px 24px var(--shadow, rgba(0,0,0,0.15))';
+                e.currentTarget.style.borderColor = 'var(--accent, #ff6600)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 12px var(--shadow, rgba(0,0,0,0.1))';
+                e.currentTarget.style.borderColor = 'var(--border, #e2e8f0)';
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
@@ -119,10 +180,10 @@ const TeacherDashboard = () => {
                 </div>
               </div>
               <div>
-                <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '8px', fontWeight: '500' }}>
+                <p style={{ fontSize: '13px', color: 'var(--text-secondary, #64748b)', marginBottom: '10px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   {card.label}
                 </p>
-                <p style={{ fontSize: '32px', fontWeight: '700', color: '#1e293b' }}>
+                <p style={{ fontSize: '40px', fontWeight: '800', color: 'var(--text-primary, #1e293b)', lineHeight: '1.2' }}>
                   {card.value ?? 0}
                 </p>
               </div>
