@@ -40,6 +40,18 @@ import GradeSubmission from './components/submissions/GradeSubmission';
 // Settings components
 import AccountSettings from './components/settings/AccountSettings';
 
+// Suppress React Router future flag warnings
+const originalWarn = console.warn;
+console.warn = (...args) => {
+  if (
+    typeof args[0] === 'string' && 
+    args[0].includes('React Router Future Flag Warning')
+  ) {
+    return; // Ignore React Router future warnings
+  }
+  originalWarn.apply(console, args);
+};
+
 const Home = () => {
   const { user } = useAuth();
 
@@ -66,7 +78,12 @@ function App() {
     <AuthProvider>
       <ThemeToggle />
       <Notification />
-      <Router>
+      <Router
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -280,4 +297,3 @@ function App() {
 }
 
 export default App;
-

@@ -2,6 +2,7 @@ const User = require('../models/User');
 const School = require('../models/School');
 const { generateToken } = require('../config/jwt');
 const { validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
 
 // Register user
 const register = async (req, res) => {
@@ -23,31 +24,9 @@ const register = async (req, res) => {
 
     // Handle different role signups
     if (role === 'admin') {
-      // Only allow specific email for admin registration
-      if (email !== 'gabriel01maina@gmail.com') {
-        return res.status(403).json({ message: 'Admin registration is restricted to authorized email addresses only' });
-      }
-      
-      // Admin can sign up directly
-      const user = await User.create({
-        email,
-        password,
-        role,
-        profile: { name },
-      });
-
-      const token = generateToken(user._id, user.role);
-
-      return res.status(201).json({
-        message: 'Admin registered successfully',
-        token,
-        user: {
-          id: user._id,
-          email: user.email,
-          role: user.role,
-          profile: user.profile,
-          isActive: user.isActive,
-        },
+      // Disable admin registration - use pre-created account only
+      return res.status(403).json({ 
+        message: 'Admin registration is disabled. Use the predefined admin account.' 
       });
     } else if (role === 'schoolRep') {
       // School rep needs school code
@@ -224,9 +203,14 @@ const login = async (req, res) => {
       return res.status(403).json({ message: 'Account is inactive. Please contact support.' });
     }
 
-    // Check password
-    const isMatch = await user.comparePassword(password);
+    // Check password using bcrypt directly to ensure consistency
+    const isMatch = await bcrypt.compare(password, user.password);
+    
     if (!isMatch) {
+      console.log('🔐 Password comparison failed');
+      console.log('📧 Email:', email);
+      console.log('🔑 Provided password:', password);
+      console.log('💾 Stored hash:', user.password);
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
@@ -279,4 +263,3 @@ const getMe = async (req, res) => {
 };
 
 module.exports = { register, login, getMe };
-
