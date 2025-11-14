@@ -9,7 +9,6 @@ const actionCards = [
   { title: 'Manage Users', subtitle: 'Search, filter, reset passwords, assign roles', target: '/admin/users' },
   { title: 'System Settings', subtitle: 'Branding, maintenance, feature toggles', target: '#system-settings' },
   { title: 'Security Center', subtitle: 'Audit logs, login history, permissions', target: '#security-center' },
-  { title: 'Announcements', subtitle: 'Send platform-wide messages', target: '#announcements' },
   { title: 'Subscriptions & Billing', subtitle: 'Plans, payments, usage', target: '#billing' },
   { title: 'Support Desk', subtitle: 'Tickets, assignments, status tracking', target: '#support' },
 ];
@@ -122,10 +121,7 @@ const AdminDashboard = () => {
         { label: 'Users', value: stats.stats.totalUsers ?? 0 },
         { label: 'Teachers', value: stats.stats.teachers ?? 0 },
         { label: 'Students', value: stats.stats.students ?? 0 },
-        { label: 'Courses', value: stats.stats.totalCourses ?? 0 },
         { label: 'Assignments', value: stats.stats.totalAssignments ?? 0 },
-        { label: 'Pending Submissions', value: stats.stats.pendingSubmissions ?? 0 },
-        { label: 'Avg Students/Course', value: stats.stats.avgStudentsPerCourse ?? 0 },
       ]
     : [];
 
@@ -347,98 +343,134 @@ const AdminDashboard = () => {
           backgroundColor: 'var(--card-bg, #fff)',
           borderRadius: '16px',
           padding: '32px',
-          boxShadow: '0 2px 8px var(--shadow, rgba(0,0,0,0.1))',
+          boxShadow: '0 4px 12px var(--shadow, rgba(0,0,0,0.1))',
           border: '1px solid var(--border, #e2e8f0)',
           marginBottom: '32px',
         }}>
-        <h2 style={{ fontSize: '24px', fontWeight: '700', color: 'var(--text-primary, #1e293b)', marginBottom: '12px' }}>System Settings</h2>
-        <p style={{ color: 'var(--text-secondary, #64748b)', marginBottom: '24px' }}>
-          UI demo — wire these controls to the platform settings service to persist branding, maintenance mode, and feature flags.
-        </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginTop: '20px' }}>
-          <div>
-            <label className="form-group">
-              <span>Platform Name</span>
-              <input
-                type="text"
-                value={branding.platformName}
-                onChange={(e) => setBranding((prev) => ({ ...prev, platformName: e.target.value }))}
-              />
-            </label>
-            <label className="form-group">
-              <span>Primary Color</span>
-              <input
-                type="color"
-                value={branding.primaryColor}
-                onChange={(e) => setBranding((prev) => ({ ...prev, primaryColor: e.target.value }))}
-              />
-            </label>
-            <label className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <input type="checkbox" checked={maintenanceMode} onChange={() => setMaintenanceMode((prev) => !prev)} />
-              Maintenance Mode
-            </label>
-          </div>
-          <div>
-            <p style={{ fontWeight: 600 }}>Feature Toggles</p>
-            {Object.keys(featureFlags).map((flag) => (
-              <label key={flag} className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <input type="checkbox" checked={featureFlags[flag]} onChange={() => handleToggleFeature(flag)} />
-                {flag.charAt(0).toUpperCase() + flag.slice(1)}
+          <h2 style={{ fontSize: '24px', fontWeight: '700', color: 'var(--text-primary, #1e293b)', marginBottom: '12px' }}>
+            ⚙️ System Settings
+          </h2>
+          <p style={{ color: 'var(--text-secondary, #64748b)', marginBottom: '24px', fontSize: '15px' }}>
+            Configure platform branding, maintenance mode, and feature toggles.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', marginTop: '20px' }}>
+            <div style={{ 
+              padding: '24px', 
+              backgroundColor: 'var(--bg-secondary, #f8fafc)', 
+              borderRadius: '12px',
+              border: '1px solid var(--border, #e2e8f0)',
+            }}>
+              <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary, #1e293b)', marginBottom: '16px' }}>
+                Branding
+              </h3>
+              <div className="form-group">
+                <label>Platform Name</label>
+                <input
+                  type="text"
+                  value={branding.platformName}
+                  onChange={(e) => setBranding((prev) => ({ ...prev, platformName: e.target.value }))}
+                  style={{ width: '100%' }}
+                />
+              </div>
+              <div className="form-group">
+                <label>Primary Color</label>
+                <input
+                  type="color"
+                  value={branding.primaryColor}
+                  onChange={(e) => setBranding((prev) => ({ ...prev, primaryColor: e.target.value }))}
+                  style={{ width: '100%', height: '40px', cursor: 'pointer' }}
+                />
+              </div>
+            </div>
+            <div style={{ 
+              padding: '24px', 
+              backgroundColor: 'var(--bg-secondary, #f8fafc)', 
+              borderRadius: '12px',
+              border: '1px solid var(--border, #e2e8f0)',
+            }}>
+              <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary, #1e293b)', marginBottom: '16px' }}>
+                Maintenance & Features
+              </h3>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={maintenanceMode} 
+                  onChange={() => {
+                    setMaintenanceMode((prev) => !prev);
+                    setSettingsMessage('Maintenance mode ' + (!maintenanceMode ? 'enabled' : 'disabled'));
+                    setTimeout(() => setSettingsMessage(''), 3000);
+                  }}
+                  style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+                />
+                <span style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text-primary, #1e293b)' }}>
+                  🔧 Maintenance Mode {maintenanceMode && '(Active)'}
+                </span>
               </label>
-            ))}
-            {settingsMessage && <p className="success">{settingsMessage}</p>}
+              <div style={{ marginTop: '20px' }}>
+                <h4 style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-secondary, #64748b)', marginBottom: '12px' }}>
+                  Feature Toggles
+                </h4>
+                {Object.keys(featureFlags).map((flag) => (
+                  <label key={flag} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', cursor: 'pointer' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={featureFlags[flag]} 
+                      onChange={() => handleToggleFeature(flag)}
+                      style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                    />
+                    <span style={{ fontSize: '14px', color: 'var(--text-primary, #1e293b)' }}>
+                      {flag.charAt(0).toUpperCase() + flag.slice(1)}
+                    </span>
+                  </label>
+                ))}
+              </div>
+              {settingsMessage && (
+                <div style={{ 
+                  marginTop: '16px', 
+                  padding: '10px 14px', 
+                  backgroundColor: 'rgba(16, 185, 129, 0.1)', 
+                  color: '#10b981',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  border: '1px solid rgba(16, 185, 129, 0.2)',
+                }}>
+                  {settingsMessage}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-        <div id="announcements" style={{
+        <div id="support" style={{
           backgroundColor: 'var(--card-bg, #fff)',
           borderRadius: '16px',
           padding: '32px',
-          boxShadow: '0 2px 8px var(--shadow, rgba(0,0,0,0.1))',
+          boxShadow: '0 4px 12px var(--shadow, rgba(0,0,0,0.1))',
           border: '1px solid var(--border, #e2e8f0)',
           marginBottom: '32px',
         }}>
-        <h2 style={{ fontSize: '24px', fontWeight: '700', color: 'var(--text-primary, #1e293b)', marginBottom: '24px' }}>Global Announcements</h2>
-        <form onSubmit={handleAnnouncementSend}>
-          <div className="form-group">
-            <label>Title</label>
-            <input
-              type="text"
-              value={newAnnouncement.title}
-              onChange={(e) => setNewAnnouncement((prev) => ({ ...prev, title: e.target.value }))}
-              required
-            />
+          <h2 style={{ fontSize: '24px', fontWeight: '700', color: 'var(--text-primary, #1e293b)', marginBottom: '24px' }}>
+            🎫 Support Desk
+          </h2>
+          <p style={{ color: 'var(--text-secondary, #64748b)', marginBottom: '20px' }}>
+            All support tickets will appear here. Users can create tickets from their dashboards.
+          </p>
+          <div style={{ 
+            textAlign: 'center', 
+            padding: '60px 20px',
+            backgroundColor: 'var(--bg-secondary, #f8fafc)',
+            borderRadius: '12px',
+            border: '1px solid var(--border, #e2e8f0)',
+          }}>
+            <div style={{ fontSize: '72px', marginBottom: '16px' }}>📨</div>
+            <h3 style={{ fontSize: '20px', fontWeight: '600', color: 'var(--text-primary, #1e293b)', marginBottom: '8px' }}>
+              Support Ticket Management
+            </h3>
+            <p style={{ color: 'var(--text-secondary, #64748b)', fontSize: '15px' }}>
+              Coming Soon - View and manage all user support tickets in one place
+            </p>
           </div>
-          <div className="form-group">
-            <label>Message</label>
-            <textarea
-              value={newAnnouncement.message}
-              onChange={(e) => setNewAnnouncement((prev) => ({ ...prev, message: e.target.value }))}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Audience</label>
-            <select
-              value={newAnnouncement.audience}
-              onChange={(e) => setNewAnnouncement((prev) => ({ ...prev, audience: e.target.value }))}
-            >
-              <option value="all">All Schools</option>
-              <option value="teachers">Teachers</option>
-              <option value="students">Students</option>
-            </select>
-          </div>
-          {announcementStatus && (
-            <div className={announcementStatus.toLowerCase().includes('error') ? 'error' : 'success'}>
-              {announcementStatus}
-            </div>
-          )}
-          <button className="btn btn-primary" type="submit">
-            Send Announcement
-          </button>
-        </form>
-      </div>
+        </div>
 
         <div style={{
           backgroundColor: 'var(--card-bg, #fff)',
@@ -481,4 +513,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-

@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import './index.css'
+import './darkMode.css'
 
 // Initialize theme from localStorage or default to light
 const savedTheme = localStorage.getItem('theme') || 'light';

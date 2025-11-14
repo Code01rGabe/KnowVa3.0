@@ -14,12 +14,11 @@ const AccountSettings = () => {
     phone: user?.profile?.phone || '',
   });
   const [message, setMessage] = useState('');
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogout = () => {
-    if (window.confirm('Are you sure you want to logout?')) {
-      logout();
-      navigate('/login');
-    }
+    logout();
+    navigate('/login');
   };
 
   const handleProfileUpdate = async (e) => {
@@ -33,7 +32,7 @@ const AccountSettings = () => {
       <div className="account-settings-container">
         <div className="settings-header">
           <h1>Account Settings</h1>
-          <p>Manage your account information and preferences</p>
+          <p>Manage your account information</p>
         </div>
 
         <div className="settings-tabs">
@@ -48,12 +47,6 @@ const AccountSettings = () => {
             onClick={() => setActiveTab('security')}
           >
             Security
-          </button>
-          <button
-            className={activeTab === 'preferences' ? 'active' : ''}
-            onClick={() => setActiveTab('preferences')}
-          >
-            Preferences
           </button>
         </div>
 
@@ -115,63 +108,137 @@ const AccountSettings = () => {
                   Update Password
                 </button>
               </div>
-              <div className="form-group" style={{ marginTop: '32px' }}>
-                <label>Two-Factor Authentication</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '8px' }}>
-                  <input type="checkbox" />
-                  <span>Enable two-factor authentication</span>
-                </div>
-              </div>
             </div>
           )}
 
-          {activeTab === 'preferences' && (
-            <div className="settings-card">
-              <h2>Preferences</h2>
-              <div className="form-group">
-                <label>Theme</label>
-                <select>
-                  <option>Light</option>
-                  <option>Dark</option>
-                  <option>System</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Language</label>
-                <select>
-                  <option>English</option>
-                  <option>Spanish</option>
-                  <option>French</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Notifications</label>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '8px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <input type="checkbox" defaultChecked />
-                    <span>Email notifications</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <input type="checkbox" defaultChecked />
-                    <span>Push notifications</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="settings-card danger-zone">
-            <h2>Danger Zone</h2>
-            <p>Once you logout, you'll need to login again to access your account.</p>
-            <button onClick={handleLogout} className="btn btn-danger">
+          <div style={{
+            backgroundColor: 'var(--card-bg, #fff)',
+            borderRadius: '16px',
+            padding: '32px',
+            marginTop: '24px',
+            border: '1px solid var(--border, #e2e8f0)',
+            boxShadow: '0 2px 8px var(--shadow, rgba(0,0,0,0.1))',
+          }}>
+            <h2 style={{ fontSize: '20px', fontWeight: '600', color: 'var(--text-primary, #1e293b)', marginBottom: '12px' }}>
+              Logout
+            </h2>
+            <p style={{ color: 'var(--text-secondary, #64748b)', marginBottom: '20px', fontSize: '15px' }}>
+              Sign out of your account. You'll need to login again to access your account.
+            </p>
+            <button 
+              onClick={() => setShowLogoutModal(true)} 
+              style={{
+                padding: '12px 24px',
+                backgroundColor: '#ef4444',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '600',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#dc2626';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#ef4444';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
               Logout
             </button>
           </div>
         </div>
+
+        {/* Logout Confirmation Modal */}
+        {showLogoutModal && (
+          <div 
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 9999,
+            }}
+            onClick={() => setShowLogoutModal(false)}
+          >
+            <div 
+              style={{
+                backgroundColor: 'var(--card-bg, #fff)',
+                borderRadius: '16px',
+                padding: '32px',
+                maxWidth: '400px',
+                width: '90%',
+                boxShadow: '0 8px 32px var(--shadow, rgba(0,0,0,0.2))',
+                border: '1px solid var(--border, #e2e8f0)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 style={{ fontSize: '24px', fontWeight: '700', color: 'var(--text-primary, #1e293b)', marginBottom: '12px' }}>
+                Confirm Logout
+              </h2>
+              <p style={{ color: 'var(--text-secondary, #64748b)', marginBottom: '24px', fontSize: '15px', lineHeight: '1.6' }}>
+                Are you sure you want to logout? You'll need to login again to access your account.
+              </p>
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                <button
+                  onClick={() => setShowLogoutModal(false)}
+                  style={{
+                    padding: '10px 20px',
+                    backgroundColor: 'transparent',
+                    color: 'var(--text-primary, #1e293b)',
+                    border: '1px solid var(--border, #e2e8f0)',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--bg-secondary, #f8fafc)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    padding: '10px 20px',
+                    backgroundColor: '#ef4444',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#dc2626';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#ef4444';
+                  }}
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );
 };
 
 export default AccountSettings;
-

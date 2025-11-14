@@ -9,8 +9,6 @@ const tabs = [
   { id: 'subjects', label: 'Subjects & Materials' },
   { id: 'attendance', label: 'Attendance' },
   { id: 'analytics', label: 'Analytics' },
-  { id: 'settings', label: 'School Settings' },
-  { id: 'communications', label: 'Communications' },
   { id: 'billing', label: 'Subscription & Billing' },
   { id: 'security', label: 'Security Center' },
   { id: 'support', label: 'Support Desk' },
@@ -320,7 +318,6 @@ const SchoolRepDashboard = () => {
         { label: 'Teachers', value: stats.teachers ?? 0 },
         { label: 'Courses', value: stats.courses ?? 0 },
         { label: 'Assignments', value: stats.assignments ?? 0 },
-        { label: 'Pending Submissions', value: stats.pendingSubmissions ?? 0 },
       ]
     : [];
 
@@ -890,8 +887,6 @@ const SchoolRepDashboard = () => {
     subjects: renderSubjects(),
     attendance: renderAttendance(),
     analytics: renderAnalytics(),
-    settings: renderSettings(),
-    communications: renderCommunications(),
     billing: renderBilling(),
     security: renderSecurity(),
     support: renderSupport(),
@@ -984,4 +979,3 @@ const SchoolRepDashboard = () => {
 };
 
 export default SchoolRepDashboard;
-
