@@ -199,14 +199,14 @@ const TeacherDashboard = () => {
         }}>
           {/* My Classes */}
           <div style={{
-            backgroundColor: '#fff',
+            backgroundColor: 'var(--card-bg)',
             borderRadius: '12px',
             padding: '24px',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            border: '1px solid #e2e8f0',
+            border: '1px solid var(--border)',
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b' }}>My Classes</h2>
+              <h2 style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)' }}>My Classes</h2>
             </div>
             {stats?.classrooms?.length ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -215,33 +215,33 @@ const TeacherDashboard = () => {
                     key={classroom.id}
                     style={{
                       padding: '16px',
-                      backgroundColor: '#f8fafc',
+                      backgroundColor: 'var(--bg-secondary)',
                       borderRadius: '8px',
-                      border: '1px solid #e2e8f0',
+                      border: '1px solid var(--border)',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#f1f5f9';
-                      e.currentTarget.style.borderColor = '#cbd5e1';
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                      e.currentTarget.style.borderColor = 'var(--accent)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#f8fafc';
-                      e.currentTarget.style.borderColor = '#e2e8f0';
+                      e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+                      e.currentTarget.style.borderColor = 'var(--border)';
                     }}
                     onClick={() => navigate(`/teacher/classes/${classroom.id}`)}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                      <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>
+                      <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>
                         {classroom.name}
                       </h3>
                     </div>
                     {classroom.level && (
-                      <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '4px' }}>
+                      <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
                         Level: {classroom.level}
                       </p>
                     )}
-                    <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '12px' }}>
+                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
                       {classroom.studentCount} students
                     </p>
                     <button
@@ -266,7 +266,7 @@ const TeacherDashboard = () => {
                 ))}
               </div>
             ) : (
-              <p style={{ color: '#64748b', fontSize: '14px' }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
                 No classes assigned yet. Contact your school administrator.
               </p>
             )}
@@ -274,14 +274,14 @@ const TeacherDashboard = () => {
 
           {/* Recent Courses */}
           <div style={{
-            backgroundColor: '#fff',
+            backgroundColor: 'var(--card-bg)',
             borderRadius: '12px',
             padding: '24px',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            border: '1px solid #e2e8f0',
+            border: '1px solid var(--border)',
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b' }}>Recent Courses</h2>
+              <h2 style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)' }}>Recent Courses</h2>
               <button
                 onClick={() => navigate('/teacher/courses')}
                 style={{
@@ -303,24 +303,24 @@ const TeacherDashboard = () => {
                     key={course.id}
                     style={{
                       padding: '16px',
-                      backgroundColor: '#f8fafc',
+                      backgroundColor: 'var(--bg-secondary)',
                       borderRadius: '8px',
-                      border: '1px solid #e2e8f0',
+                      border: '1px solid var(--border)',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#f1f5f9';
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#f8fafc';
+                      e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
                     }}
                     onClick={() => navigate(`/teacher/courses/${course.id}`)}
                   >
-                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '8px' }}>
                       {course.title}
                     </h3>
-                    <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '12px' }}>
+                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
                       {course.students} students enrolled
                     </p>
                     <button
@@ -346,7 +346,7 @@ const TeacherDashboard = () => {
               </div>
             ) : (
               <div>
-                <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '12px' }}>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '12px' }}>
                   No courses yet.
                 </p>
                 <button
@@ -370,14 +370,14 @@ const TeacherDashboard = () => {
 
           {/* Upcoming Deadlines */}
           <div style={{
-            backgroundColor: '#fff',
+            backgroundColor: 'var(--card-bg)',
             borderRadius: '12px',
             padding: '24px',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            border: '1px solid #e2e8f0',
+            border: '1px solid var(--border)',
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b' }}>Upcoming Deadlines</h2>
+              <h2 style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)' }}>Upcoming Deadlines</h2>
               <button
                 onClick={() => navigate('/teacher/assignments')}
                 style={{
@@ -399,15 +399,15 @@ const TeacherDashboard = () => {
                     key={assignment.id}
                     style={{
                       padding: '16px',
-                      backgroundColor: '#f8fafc',
+                      backgroundColor: 'var(--bg-secondary)',
                       borderRadius: '8px',
-                      border: '1px solid #e2e8f0',
+                      border: '1px solid var(--border)',
                     }}
                   >
-                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '8px' }}>
                       {assignment.title}
                     </h3>
-                    <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '12px' }}>
+                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
                       Due {new Date(assignment.dueDate).toLocaleDateString()}
                     </p>
                     <button
@@ -429,7 +429,7 @@ const TeacherDashboard = () => {
                 ))}
               </div>
             ) : (
-              <p style={{ color: '#64748b', fontSize: '14px' }}>No upcoming assignments.</p>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>No upcoming assignments.</p>
             )}
           </div>
         </div>

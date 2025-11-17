@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 
 const emptyForm = {
@@ -10,6 +11,7 @@ const emptyForm = {
 };
 
 const ManageSchools = () => {
+  const navigate = useNavigate();
   const [schools, setSchools] = useState([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -129,6 +131,13 @@ const ManageSchools = () => {
     <div className="container">
       <div className="fade-up" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <div>
+          <button 
+            onClick={() => navigate('/admin/dashboard')} 
+            className="btn outline-button" 
+            style={{ marginBottom: '16px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+          >
+            ← Back to Dashboard
+          </button>
           <p className="badge">Admin · Manage Schools</p>
           <h1>Schools Directory</h1>
           <p style={{ color: 'var(--text-secondary)' }}>Create, update, suspend, or analyze every school on the platform.</p>

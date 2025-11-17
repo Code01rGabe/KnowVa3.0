@@ -335,7 +335,7 @@ const SchoolRepDashboard = () => {
           {message}
         </div>
       )}
-      <div style={{ 
+      <div style={{
         display: 'grid', 
         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
         gap: '20px',
@@ -347,16 +347,16 @@ const SchoolRepDashboard = () => {
             <div
               key={card.label}
               style={{
-                backgroundColor: '#f8fafc',
+                backgroundColor: 'var(--bg-secondary)',
                 borderRadius: '10px',
                 padding: '20px',
-                border: '1px solid #e2e8f0',
+                border: '1px solid var(--border)',
               }}
             >
-              <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '8px', fontWeight: '500' }}>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: '500' }}>
                 {card.label}
               </p>
-              <p style={{ fontSize: '28px', fontWeight: '700', color: '#1e293b' }}>
+              <p style={{ fontSize: '28px', fontWeight: '700', color: 'var(--text-primary)' }}>
                 {card.value ?? 0}
               </p>
             </div>
@@ -365,10 +365,10 @@ const SchoolRepDashboard = () => {
       </div>
 
       <div style={{
-        backgroundColor: '#f8fafc',
+        backgroundColor: 'var(--bg-secondary)',
         borderRadius: '10px',
         padding: '24px',
-        border: '1px solid #e2e8f0',
+        border: '1px solid var(--border)',
       }}>
         <h2>Registration Codes</h2>
         <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>

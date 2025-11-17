@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 
 const ManageUsers = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
@@ -93,6 +95,13 @@ const ManageUsers = () => {
     <div className="container">
       <div className="fade-up" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <div>
+          <button 
+            onClick={() => navigate('/admin/dashboard')} 
+            className="btn outline-button" 
+            style={{ marginBottom: '16px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+          >
+            ← Back to Dashboard
+          </button>
           <p className="badge">Admin · Manage Users</p>
           <h1>User Directory</h1>
           <p style={{ color: 'var(--text-secondary)' }}>View every user, update roles, toggle access, and reset passwords.</p>

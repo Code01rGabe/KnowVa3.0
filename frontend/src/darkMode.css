@@ -84,3 +84,266 @@
   color: var(--text-secondary);
   opacity: 0.8;
 }
+
+/* Dashboard Dark Mode Fixes */
+
+/* Override all hardcoded text colors in dark mode */
+[data-theme='dark'] h1,
+[data-theme='dark'] h2,
+[data-theme='dark'] h3,
+[data-theme='dark'] h4,
+[data-theme='dark'] h5,
+[data-theme='dark'] h6 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme='dark'] p,
+[data-theme='dark'] span,
+[data-theme='dark'] div,
+[data-theme='dark'] td,
+[data-theme='dark'] th,
+[data-theme='dark'] label {
+  color: inherit;
+}
+
+/* Fix card backgrounds in dark mode */
+[data-theme='dark'] [style*="background-color: #fff"],
+[data-theme='dark'] [style*="background-color:#fff"],
+[data-theme='dark'] [style*="backgroundColor: '#fff'"],
+[data-theme='dark'] [style*='backgroundColor: "#fff"'] {
+  background-color: var(--card-bg) !important;
+}
+
+[data-theme='dark'] [style*="background-color: #f8fafc"],
+[data-theme='dark'] [style*="background-color:#f8fafc"],
+[data-theme='dark'] [style*="backgroundColor: '#f8fafc'"],
+[data-theme='dark'] [style*='backgroundColor: "#f8fafc"'] {
+  background-color: var(--bg-secondary) !important;
+}
+
+[data-theme='dark'] [style*="background-color: #f1f5f9"],
+[data-theme='dark'] [style*="background-color:#f1f5f9"] {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Fix text colors in dark mode */
+[data-theme='dark'] [style*="color: #1e293b"],
+[data-theme='dark'] [style*="color:#1e293b"],
+[data-theme='dark'] [style*="color: '#1e293b'"],
+[data-theme='dark'] [style*='color: "#1e293b"'] {
+  color: var(--text-primary) !important;
+}
+
+[data-theme='dark'] [style*="color: #64748b"],
+[data-theme='dark'] [style*="color:#64748b"],
+[data-theme='dark'] [style*="color: '#64748b'"],
+[data-theme='dark'] [style*='color: "#64748b"'] {
+  color: var(--text-secondary) !important;
+}
+
+/* Fix border colors */
+[data-theme='dark'] [style*="border: 1px solid #e2e8f0"],
+[data-theme='dark'] [style*="border:1px solid #e2e8f0"],
+[data-theme='dark'] [style*="border-color: #e2e8f0"],
+[data-theme='dark'] [style*="borderColor: '#e2e8f0'"],
+[data-theme='dark'] [style*='borderColor: "#e2e8f0"'] {
+  border-color: var(--border) !important;
+}
+
+/* Fix stats cards */
+[data-theme='dark'] .stats-card,
+[data-theme='dark'] .glass-card {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme='dark'] .stats-card h3,
+[data-theme='dark'] .glass-card h3 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme='dark'] .stats-card .value,
+[data-theme='dark'] .glass-card .value {
+  color: var(--text-primary) !important;
+}
+
+/* Fix table text */
+[data-theme='dark'] .list-table th,
+[data-theme='dark'] .list-table td {
+  color: var(--text-primary) !important;
+}
+
+/* Fix form elements */
+[data-theme='dark'] input,
+[data-theme='dark'] textarea,
+[data-theme='dark'] select {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border) !important;
+}
+
+[data-theme='dark'] input::placeholder,
+[data-theme='dark'] textarea::placeholder {
+  color: var(--text-secondary) !important;
+  opacity: 0.7;
+}
+
+/* Fix specific inline styles that might cause issues */
+[data-theme='dark'] [style*="box-shadow"] {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Ensure pastel backgrounds are visible in dark mode */
+[data-theme='dark'] [style*="background-color: var(--pastel-pink"],
+[data-theme='dark'] [style*="background-color: var(--pastel-blue"],
+[data-theme='dark'] [style*="background-color: var(--pastel-green"],
+[data-theme='dark'] [style*="backgroundColor: var(--pastel-pink"],
+[data-theme='dark'] [style*="backgroundColor: var(--pastel-blue"],
+[data-theme='dark'] [style*="backgroundColor: var(--pastel-green"] {
+  background-color: rgba(255, 102, 0, 0.1) !important;
+  border-color: rgba(255, 102, 0, 0.2) !important;
+}
+
+/* Fix button text visibility */
+[data-theme='dark'] button:not(.btn-primary):not(.btn-danger) {
+  color: var(--text-primary);
+}
+
+/* Make sure strong/bold text is visible */
+[data-theme='dark'] strong {
+  color: var(--text-primary) !important;
+}
+
+/* Fix links */
+[data-theme='dark'] a {
+  color: var(--accent);
+}
+
+/* Additional aggressive fixes for inline styles */
+[data-theme='dark'] [style*="color: '#1e293b'"],
+[data-theme='dark'] [style*='color: "#1e293b"'],
+[data-theme='dark'] [style*="color: #1e293b"] {
+  color: var(--text-primary) !important;
+}
+
+[data-theme='dark'] [style*="color: '#64748b'"],
+[data-theme='dark'] [style*='color: "#64748b"'],
+[data-theme='dark'] [style*="color: #64748b"] {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme='dark'] [style*="color: '#10b981'"],
+[data-theme='dark'] [style*='color: "#10b981"'],
+[data-theme='dark'] [style*="color: #10b981"] {
+  color: #10b981 !important;
+}
+
+/* Force all text elements to be visible */
+[data-theme='dark'] * {
+  color: inherit;
+}
+
+/* Re-apply proper colors to specific elements */
+[data-theme='dark'] body,
+[data-theme='dark'] .container {
+  color: var(--text-primary);
+}
+
+/* Override hardcoded background colors more aggressively */
+[data-theme='dark'] [style*="backgroundColor: '#fff'"],
+[data-theme='dark'] [style*='backgroundColor: "#fff"'],
+[data-theme='dark'] [style*="backgroundColor: #fff"],
+[data-theme='dark'] [style*="background-color: #ffffff"],
+[data-theme='dark'] [style*='background-color:#ffffff'] {
+  background-color: var(--card-bg) !important;
+}
+
+[data-theme='dark'] [style*="backgroundColor: '#f8fafc'"],
+[data-theme='dark'] [style*='backgroundColor: "#f8fafc"'],
+[data-theme='dark'] [style*="backgroundColor: #f8fafc"] {
+  background-color: var(--bg-secondary) !important;
+}
+
+[data-theme='dark'] [style*="backgroundColor: '#f1f5f9'"],
+[data-theme='dark'] [style*='backgroundColor: "#f1f5f9"'],
+[data-theme='dark'] [style*="backgroundColor: #f1f5f9"] {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Fix all border colors */
+[data-theme='dark'] [style*="border: 1px solid #e2e8f0"],
+[data-theme='dark'] [style*='border: 1px solid #e2e8f0'],
+[data-theme='dark'] [style*="border:1px solid #e2e8f0"] {
+  border-color: var(--border) !important;
+}
+
+/* Ensure hover states work in dark mode */
+[data-theme='dark'] [style*="cursor: pointer"]:hover {
+  opacity: 0.9;
+}
+
+/* Fix specific student dashboard issues */
+[data-theme='dark'] .container > div > div {
+  color: var(--text-primary);
+}
+
+/* Make absolutely sure h2, h3 in cards are visible */
+[data-theme='dark'] div[style*="#fff"] h2,
+[data-theme='dark'] div[style*="#fff"] h3,
+[data-theme='dark'] div[style*="#f8fafc"] h3,
+[data-theme='dark'] div[style*="#f8fafc"] p {
+  color: var(--text-primary) !important;
+}
+
+/* Ultra-aggressive text visibility fixes for student dashboard */
+[data-theme='dark'] div[style*="backgroundColor: '#fff'"] *,
+[data-theme='dark'] div[style*='backgroundColor: "#fff"'] *,
+[data-theme='dark'] div[style*="backgroundColor: #fff"] *,
+[data-theme='dark'] div[style*="background-color: #fff"] * {
+  color: var(--text-primary) !important;
+}
+
+[data-theme='dark'] div[style*="backgroundColor: '#f8fafc'"] *,
+[data-theme='dark'] div[style*='backgroundColor: "#f8fafc"'] *,
+[data-theme='dark'] div[style*="backgroundColor: #f8fafc"] * {
+  color: var(--text-primary) !important;
+}
+
+/* Fix secondary text colors in cards */
+[data-theme='dark'] p[style*="color: '#64748b'"],
+[data-theme='dark'] p[style*='color: "#64748b"'],
+[data-theme='dark'] p[style*="color: #64748b"] {
+  color: var(--text-secondary) !important;
+}
+
+/* Ensure all nested elements inherit proper colors */
+[data-theme='dark'] div[style*="#fff"] > div > *,
+[data-theme='dark'] div[style*="#f8fafc"] > div > * {
+  color: inherit !important;
+}
+
+/* Fix button text in cards */
+[data-theme='dark'] div[style*="#fff"] button,
+[data-theme='dark'] div[style*="#f8fafc"] button {
+  color: #ff6600 !important;
+}
+
+[data-theme='dark'] div[style*="#fff"] button[style*="color: #ff6600"],
+[data-theme='dark'] div[style*="#f8fafc"] button[style*="color: #ff6600"] {
+  color: #ff6600 !important;
+}
+
+/* Ensure proper inheritance for all text elements */
+[data-theme='dark'] h2[style*="color: #1e293b"],
+[data-theme='dark'] h3[style*="color: #1e293b"] {
+  color: var(--text-primary) !important;
+}
+
+/* Fix all possible color variations */
+[data-theme='dark'] *[style*="color: #1e293b"] {
+  color: var(--text-primary) !important;
+}
+
+[data-theme='dark'] *[style*="color: #64748b"] {
+  color: var(--text-secondary) !important;
+}

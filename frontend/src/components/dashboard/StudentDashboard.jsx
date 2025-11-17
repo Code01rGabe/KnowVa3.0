@@ -196,45 +196,45 @@ const StudentDashboard = () => {
           gap: '24px' 
         }}>
           <div style={{
-            backgroundColor: '#fff',
+            backgroundColor: 'var(--card-bg)',
             borderRadius: '12px',
             padding: '24px',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            border: '1px solid #e2e8f0',
+            border: '1px solid var(--border)',
           }}>
-            <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', marginBottom: '20px' }}>My Classes</h2>
+            <h2 style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '20px' }}>My Classes</h2>
             {stats?.classrooms?.length ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {stats.classrooms.map((classroom) => (
-                  <div key={classroom.id} style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>{classroom.name}</h3>
-                    {classroom.level && <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '4px' }}>Level: {classroom.level}</p>}
-                    <p style={{ fontSize: '13px', color: '#64748b' }}>{classroom.teacherCount} teacher{classroom.teacherCount !== 1 ? 's' : ''}</p>
+                  <div key={classroom.id} style={{ padding: '16px', backgroundColor: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '8px' }}>{classroom.name}</h3>
+                    {classroom.level && <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Level: {classroom.level}</p>}
+                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{classroom.teacherCount} teacher{classroom.teacherCount !== 1 ? 's' : ''}</p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p style={{ color: '#64748b', fontSize: '14px' }}>No classes assigned yet.</p>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>No classes assigned yet.</p>
             )}
           </div>
 
           <div style={{
-            backgroundColor: '#fff',
+            backgroundColor: 'var(--card-bg)',
             borderRadius: '12px',
             padding: '24px',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            border: '1px solid #e2e8f0',
+            border: '1px solid var(--border)',
           }}>
-            <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', marginBottom: '20px' }}>My Courses</h2>
+            <h2 style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '20px' }}>My Courses</h2>
             {stats?.courses?.length ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {stats.courses.map((course) => (
-                  <div key={course._id} style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', cursor: 'pointer' }}
+                  <div key={course._id} style={{ padding: '16px', backgroundColor: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border)', cursor: 'pointer' }}
                     onClick={() => navigate(`/student/courses/${course._id}`)}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'}
                   >
-                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{course.title}</h3>
+                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{course.title}</h3>
                     <button style={{ marginTop: '8px', padding: '6px 12px', fontSize: '13px', backgroundColor: 'transparent', color: '#ff6600', border: '1px solid #ff6600', borderRadius: '6px', cursor: 'pointer' }}
                       onClick={(e) => { e.stopPropagation(); navigate(`/student/courses/${course._id}`); }}
                     >
@@ -244,24 +244,24 @@ const StudentDashboard = () => {
                 ))}
               </div>
             ) : (
-              <p style={{ color: '#64748b', fontSize: '14px' }}>You are not enrolled in any courses yet.</p>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>You are not enrolled in any courses yet.</p>
             )}
           </div>
 
           <div style={{
-            backgroundColor: '#fff',
+            backgroundColor: 'var(--card-bg)',
             borderRadius: '12px',
             padding: '24px',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            border: '1px solid #e2e8f0',
+            border: '1px solid var(--border)',
           }}>
-            <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', marginBottom: '20px' }}>Upcoming Assignments</h2>
+            <h2 style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '20px' }}>Upcoming Assignments</h2>
             {stats?.upcomingAssignments?.length ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {stats.upcomingAssignments.map((assignment) => (
-                  <div key={assignment.id} style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>{assignment.title}</h3>
-                    <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '12px' }}>
+                  <div key={assignment.id} style={{ padding: '16px', backgroundColor: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '8px' }}>{assignment.title}</h3>
+                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
                       Due {new Date(assignment.dueDate).toLocaleDateString()} • {assignment.courseTitle}
                     </p>
                     <button style={{ padding: '6px 12px', fontSize: '13px', backgroundColor: 'transparent', color: '#ff6600', border: '1px solid #ff6600', borderRadius: '6px', cursor: 'pointer' }}
@@ -273,29 +273,29 @@ const StudentDashboard = () => {
                 ))}
               </div>
             ) : (
-              <p style={{ color: '#64748b', fontSize: '14px' }}>No upcoming assignments. Enjoy the breather!</p>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>No upcoming assignments. Enjoy the breather!</p>
             )}
           </div>
 
           <div style={{
-            backgroundColor: '#fff',
+            backgroundColor: 'var(--card-bg)',
             borderRadius: '12px',
             padding: '24px',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            border: '1px solid #e2e8f0',
+            border: '1px solid var(--border)',
           }}>
-            <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', marginBottom: '20px' }}>Recent Grades</h2>
+            <h2 style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '20px' }}>Recent Grades</h2>
             {stats?.recentGrades?.length ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {stats.recentGrades.map((submission) => (
-                  <div key={submission.id} style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>{submission.title}</h3>
-                    <p style={{ fontSize: '14px', color: '#64748b' }}>Grade: <strong style={{ color: '#10b981' }}>{submission.grade}</strong></p>
+                  <div key={submission.id} style={{ padding: '16px', backgroundColor: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '8px' }}>{submission.title}</h3>
+                    <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Grade: <strong style={{ color: '#10b981' }}>{submission.grade}</strong></p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p style={{ color: '#64748b', fontSize: '14px' }}>No graded submissions yet.</p>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>No graded submissions yet.</p>
             )}
           </div>
         </div>
