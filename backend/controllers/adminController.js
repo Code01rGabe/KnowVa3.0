@@ -15,7 +15,6 @@ const generateSchoolCode = async (req, res) => {
 
     const { schoolName } = req.body;
 
-    // Generate unique school code
     let schoolCode;
     let isUnique = false;
     
@@ -31,7 +30,7 @@ const generateSchoolCode = async (req, res) => {
     const school = await School.create({
       name: schoolName,
       schoolCode,
-      schoolRepId: null, // Will be set when school rep registers
+      schoolRepId: null, 
     });
 
     res.status(201).json({

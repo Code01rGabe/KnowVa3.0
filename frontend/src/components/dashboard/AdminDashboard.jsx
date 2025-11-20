@@ -28,7 +28,7 @@ const AdminDashboard = () => {
     analytics: true,
   });
   const [branding, setBranding] = useState({
-    platformName: 'KnowVa Learning',
+    platformName: 'KnowVa',
     primaryColor: '#ff6600',
   });
   const [newAnnouncement, setNewAnnouncement] = useState({
@@ -80,7 +80,6 @@ const AdminDashboard = () => {
       setSchoolsPreview(response.data.data || []);
     } catch (error) {
       console.error('Error previewing schools:', error);
-      // Don't throw here, just log - schools preview is not critical
     }
   };
 
@@ -102,7 +101,6 @@ const AdminDashboard = () => {
       setAnnouncementStatus('Announcement sent successfully!');
       setNewAnnouncement({ title: '', message: '', audience: 'all' });
       
-      // Clear success message after 3 seconds
       setTimeout(() => {
         setAnnouncementStatus('');
       }, 3000);
@@ -373,13 +371,8 @@ const AdminDashboard = () => {
                 />
               </div>
               <div className="form-group">
-                <label>Primary Color</label>
-                <input
-                  type="color"
-                  value={branding.primaryColor}
-                  onChange={(e) => setBranding((prev) => ({ ...prev, primaryColor: e.target.value }))}
-                  style={{ width: '100%', height: '40px', cursor: 'pointer' }}
-                />
+                
+              
               </div>
             </div>
             <div style={{ 

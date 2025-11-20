@@ -29,7 +29,6 @@ const TeacherDashboard = () => {
       console.error('Error loading dashboard stats:', error);
       console.error('Error details:', error.response?.data);
       setError(error.response?.data?.message || 'Failed to load dashboard data. Please check your connection.');
-      // Set empty stats so the dashboard still renders
       setStats({ metrics: {}, classrooms: [], recentCourses: [], upcomingAssignments: [] });
     } finally {
       setLoading(false);
