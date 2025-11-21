@@ -372,21 +372,21 @@ const SchoolRepDashboard = () => {
       }}>
         <h2>Registration Codes</h2>
         <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-          <div className="glass-card stats-card">
-            <h3>Teacher Code</h3>
-            <div className="value">{school?.teacherCode || 'Not generated'}</div>
-            <button className="btn btn-primary" onClick={() => regenerateCode('teacher')} style={{ marginTop: 10 }}>
-              {school?.teacherCode ? 'Regenerate' : 'Generate'}
-            </button>
-          </div>
-          <div className="glass-card stats-card">
-            <h3>Student Code</h3>
-            <div className="value">{school?.studentCode || 'Not generated'}</div>
-            <button className="btn btn-primary" onClick={() => regenerateCode('student')} style={{ marginTop: 10 }}>
-              {school?.studentCode ? 'Regenerate' : 'Generate'}
-            </button>
-          </div>
-        </div>
+  <div className="glass-card stats-card" style={{ textAlign: 'center' }}>
+    <h3 style={{ fontSize: '0.8rem', marginBottom: '8px' }}>Teacher Code</h3>
+    <div className="value" style={{ fontSize: '0.75rem', marginBottom: '8px' }}>{school?.teacherCode || 'Not generated'}</div>
+    <button className="btn btn-primary" onClick={() => regenerateCode('teacher')} style={{ marginTop: 0, fontSize: '0.7rem', padding: '4px 8px' }}>
+      {school?.teacherCode ? 'Regenerate' : 'Generate'}
+    </button>
+  </div>
+  <div className="glass-card stats-card" style={{ textAlign: 'center' }}>
+    <h3 style={{ fontSize: '0.8rem', marginBottom: '8px' }}>Student Code</h3>
+    <div className="value" style={{ fontSize: '0.75rem', marginBottom: '8px' }}>{school?.studentCode || 'Not generated'}</div>
+    <button className="btn btn-primary" onClick={() => regenerateCode('student')} style={{ marginTop: 0, fontSize: '0.7rem', padding: '4px 8px' }}>
+      {school?.studentCode ? 'Regenerate' : 'Generate'}
+    </button>
+  </div>
+</div>
       </div>
     </>
   );
