@@ -232,7 +232,7 @@ const AssignmentDetail = () => {
                     fontWeight: '600',
                   }}
                 >
-                  Submit Assignment
+                  Start Assignment
                 </button>
               </div>
             )}

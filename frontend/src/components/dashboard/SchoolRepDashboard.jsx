@@ -370,18 +370,20 @@ const SchoolRepDashboard = () => {
         padding: '24px',
         border: '1px solid var(--border)',
       }}>
-        <h2>Registration Codes</h2>
-        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-  <div className="glass-card stats-card" style={{ textAlign: 'center' }}>
-    <h3 style={{ fontSize: '0.8rem', marginBottom: '8px' }}>Teacher Code</h3>
-    <div className="value" style={{ fontSize: '0.75rem', marginBottom: '8px' }}>{school?.teacherCode || 'Not generated'}</div>
+        <div style={{ textAlign: 'center' }}>
+  <h2>Registration Codes</h2>
+</div>
+        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
+  <div className="glass-card stats-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+    <h3 style={{ fontSize: '0.8rem', marginBottom: '8px', width: '100%' }}>Teacher Code</h3>
+    <div className="value" style={{ fontSize: '0.75rem', marginBottom: '8px', width: '100%' }}>{school?.teacherCode || 'Not generated'}</div>
     <button className="btn btn-primary" onClick={() => regenerateCode('teacher')} style={{ marginTop: 0, fontSize: '0.7rem', padding: '4px 8px' }}>
       {school?.teacherCode ? 'Regenerate' : 'Generate'}
     </button>
   </div>
-  <div className="glass-card stats-card" style={{ textAlign: 'center' }}>
-    <h3 style={{ fontSize: '0.8rem', marginBottom: '8px' }}>Student Code</h3>
-    <div className="value" style={{ fontSize: '0.75rem', marginBottom: '8px' }}>{school?.studentCode || 'Not generated'}</div>
+  <div className="glass-card stats-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+    <h3 style={{ fontSize: '0.8rem', marginBottom: '8px', width: '100%' }}>Student Code</h3>
+    <div className="value" style={{ fontSize: '0.75rem', marginBottom: '8px', width: '100%' }}>{school?.studentCode || 'Not generated'}</div>
     <button className="btn btn-primary" onClick={() => regenerateCode('student')} style={{ marginTop: 0, fontSize: '0.7rem', padding: '4px 8px' }}>
       {school?.studentCode ? 'Regenerate' : 'Generate'}
     </button>

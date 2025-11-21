@@ -61,9 +61,9 @@ const LandingPage = () => {
           <div className="floating-card glass-card fade-up">
             <h4>Today’s Momentum</h4>
             <ul style={{ marginTop: '12px', listStyle: 'none' }}>
-              <li>+3 New schools onboarded</li>
-              <li>+58 Assignments graded</li>
-              <li>98% Student satisfaction</li>
+              <li>+1 New schools onboarded</li>
+              <li>+2 Assignments graded</li>
+              <li>99% Student satisfaction</li>
             </ul>
           </div>
         </div>
@@ -83,7 +83,7 @@ const LandingPage = () => {
 
       <section className="glass-card fade-up" style={{ marginTop: '60px' }}>
         <h2>Built for forward-thinking schools</h2>
-        <p style={{ marginTop: '10px', color: 'var(--text-secondary)' }}>
+        <p style={{ marginTop: '10px', color: 'var(--text-secondary)'  }}>
           From streamlined onboarding to immersive learning analytics, KnowVa adapts to the way your institution works.
           Launch your next cohort in minutes, not weeks.
         </p>
