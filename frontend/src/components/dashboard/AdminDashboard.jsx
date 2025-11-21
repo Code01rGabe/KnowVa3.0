@@ -119,7 +119,6 @@ const AdminDashboard = () => {
         { label: 'Users', value: stats.stats.totalUsers ?? 0 },
         { label: 'Teachers', value: stats.stats.teachers ?? 0 },
         { label: 'Students', value: stats.stats.students ?? 0 },
-        { label: 'Assignments', value: stats.stats.totalAssignments ?? 0 },
       ]
     : [];
 
@@ -345,93 +344,8 @@ const AdminDashboard = () => {
           border: '1px solid var(--border, #e2e8f0)',
           marginBottom: '32px',
         }}>
-          <h2 style={{ fontSize: '24px', fontWeight: '700', color: 'var(--text-primary, #1e293b)', marginBottom: '12px' }}>
-            ⚙️ System Settings
-          </h2>
-          <p style={{ color: 'var(--text-secondary, #64748b)', marginBottom: '24px', fontSize: '15px' }}>
-            Configure platform branding, maintenance mode, and feature toggles.
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', marginTop: '20px' }}>
-            <div style={{ 
-              padding: '24px', 
-              backgroundColor: 'var(--bg-secondary, #f8fafc)', 
-              borderRadius: '12px',
-              border: '1px solid var(--border, #e2e8f0)',
-            }}>
-              <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary, #1e293b)', marginBottom: '16px' }}>
-                Branding
-              </h3>
-              <div className="form-group">
-                <label>Platform Name</label>
-                <input
-                  type="text"
-                  value={branding.platformName}
-                  onChange={(e) => setBranding((prev) => ({ ...prev, platformName: e.target.value }))}
-                  style={{ width: '100%' }}
-                />
-              </div>
-              <div className="form-group">
-                
-              
-              </div>
-            </div>
-            <div style={{ 
-              padding: '24px', 
-              backgroundColor: 'var(--bg-secondary, #f8fafc)', 
-              borderRadius: '12px',
-              border: '1px solid var(--border, #e2e8f0)',
-            }}>
-              <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary, #1e293b)', marginBottom: '16px' }}>
-                Maintenance & Features
-              </h3>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={maintenanceMode} 
-                  onChange={() => {
-                    setMaintenanceMode((prev) => !prev);
-                    setSettingsMessage('Maintenance mode ' + (!maintenanceMode ? 'enabled' : 'disabled'));
-                    setTimeout(() => setSettingsMessage(''), 3000);
-                  }}
-                  style={{ width: '20px', height: '20px', cursor: 'pointer' }}
-                />
-                <span style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text-primary, #1e293b)' }}>
-                  🔧 Maintenance Mode {maintenanceMode && '(Active)'}
-                </span>
-              </label>
-              <div style={{ marginTop: '20px' }}>
-                <h4 style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-secondary, #64748b)', marginBottom: '12px' }}>
-                  Feature Toggles
-                </h4>
-                {Object.keys(featureFlags).map((flag) => (
-                  <label key={flag} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', cursor: 'pointer' }}>
-                    <input 
-                      type="checkbox" 
-                      checked={featureFlags[flag]} 
-                      onChange={() => handleToggleFeature(flag)}
-                      style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                    />
-                    <span style={{ fontSize: '14px', color: 'var(--text-primary, #1e293b)' }}>
-                      {flag.charAt(0).toUpperCase() + flag.slice(1)}
-                    </span>
-                  </label>
-                ))}
-              </div>
-              {settingsMessage && (
-                <div style={{ 
-                  marginTop: '16px', 
-                  padding: '10px 14px', 
-                  backgroundColor: 'rgba(16, 185, 129, 0.1)', 
-                  color: '#10b981',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  border: '1px solid rgba(16, 185, 129, 0.2)',
-                }}>
-                  {settingsMessage}
-                </div>
-              )}
-            </div>
-          </div>
+          
+          
         </div>
 
         <div id="support" style={{

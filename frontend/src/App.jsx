@@ -47,7 +47,7 @@ console.warn = (...args) => {
     typeof args[0] === 'string' && 
     args[0].includes('React Router Future Flag Warning')
   ) {
-    return; // Ignore React Router future warnings
+    return; 
   }
   originalWarn.apply(console, args);
 };
