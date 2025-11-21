@@ -559,16 +559,8 @@ const SchoolRepDashboard = () => {
     <div>
       <h2>Attendance</h2>
       <form onSubmit={recordAttendance}>
-        <div className="form-group">
-          <label>Records (JSON array)</label>
-          <textarea
-            placeholder='[{"studentId":"...", "classroomId":"...", "status":"present"}]'
-            value={attendanceJson}
-            onChange={(e) => setAttendanceJson(e.target.value)}
-            required
-          />
-        </div>
-        <button className="btn btn-primary">Record Attendance</button>
+        
+        
       </form>
       <div style={{ marginTop: 20 }}>
         <table className="list-table">
